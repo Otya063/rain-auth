@@ -14,7 +14,7 @@ Generate prisma client for accelerate.
 npx prisma generate --no-engine
 ```
 
-Start local server.
+Start a local server for developing Worker.
 ```bash
 wrangler dev
 ```
