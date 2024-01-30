@@ -2,7 +2,7 @@ import type { Action, Actions, PageServerLoad } from './$types';
 import type { users } from '@prisma/client/edge';
 import { redirect, error, fail } from '@sveltejs/kit';
 import { PUBLIC_AUTH_DOMAIN } from '$env/static/public';
-import { COOKIES_DOMAIN, COOKIES_SECURE, DISCORD_CLIENT_ID, TURNSTILE_SECRET_KEY } from '$env/static/private';
+import { COOKIES_DOMAIN, DISCORD_CLIENT_ID, TURNSTILE_SECRET_KEY } from '$env/static/private';
 import ServerData, { db } from '$lib/database';
 import { convFormDataToObj, getRandomString, validateToken } from '$lib/utils';
 import bcrypt from 'bcryptjs';
@@ -69,7 +69,7 @@ const login: Action = async ({ request, cookies, locals: { LL } }) => {
             domain: COOKIES_DOMAIN,
             path: '/',
             maxAge: remember_me === 'on' ? 60 * 60 * 24 * 30 : undefined,
-            secure: COOKIES_SECURE === 'true',
+            secure: true,
             httpOnly: true,
         });
 
