@@ -19,7 +19,6 @@ jobs:
             DIRECT_URL: ${{ secrets.DIRECT_URL }}
             ADMIN_CREDENTIALS: ${{ secrets.ADMIN_CREDENTIALS }}
             COOKIES_DOMAIN: ${{ secrets.COOKIES_DOMAIN }}
-            COOKIES_SECURE: ${{ secrets.COOKIES_SECURE }}
             PUBLIC_MAIN_DOMAIN: ${{ secrets.PROD_MAIN_DOMAIN }}
             PUBLIC_AUTH_DOMAIN: ${{ secrets.PROD_AUTH_DOMAIN }}
             DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}

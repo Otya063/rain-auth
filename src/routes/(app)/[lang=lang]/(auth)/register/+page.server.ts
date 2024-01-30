@@ -1,7 +1,7 @@
 import type { Action, Actions } from './$types';
 import type { users } from '@prisma/client/edge';
 import { fail } from '@sveltejs/kit';
-import { COOKIES_DOMAIN, COOKIES_SECURE, TURNSTILE_SECRET_KEY } from '$env/static/private';
+import { COOKIES_DOMAIN, TURNSTILE_SECRET_KEY } from '$env/static/private';
 import ServerData from '$lib/database';
 import { convFormDataToObj, validateToken } from '$lib/utils';
 import bcrypt from 'bcryptjs';
@@ -51,13 +51,13 @@ const prepRegister: Action = async ({ request, cookies, locals: { LL } }) => {
             cookies.set('username', String(username), {
                 domain: COOKIES_DOMAIN,
                 path: '/',
-                secure: COOKIES_SECURE === 'true',
+                secure: true,
                 httpOnly: true,
             });
             cookies.set('hashedPassword', hashed_pass, {
                 domain: COOKIES_DOMAIN,
                 path: '/',
-                secure: COOKIES_SECURE === 'true',
+                secure: true,
                 httpOnly: true,
             });
 

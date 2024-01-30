@@ -1,7 +1,7 @@
 import type { PageServerLoad } from '../$types';
 import type { discord, discord_register } from '@prisma/client/edge';
 import { error, type Action, fail, type Actions, type NumericRange } from '@sveltejs/kit';
-import { COOKIES_DOMAIN, COOKIES_SECURE, TURNSTILE_SECRET_KEY } from '$env/static/private';
+import { COOKIES_DOMAIN, TURNSTILE_SECRET_KEY } from '$env/static/private';
 import ServerData, { db } from '$lib/database';
 import { getGuildMember, getUserData, addRoleToUser, sendDirectMessages } from '$lib/discord';
 import type { PreRegisterGetData, RainApiPostResponseData } from '$lib/types';
@@ -22,13 +22,13 @@ export const load: PageServerLoad = async ({ url, cookies, locals: { LL, tokenDa
     cookies.delete('username', {
         domain: COOKIES_DOMAIN,
         path: '/',
-        secure: COOKIES_SECURE === 'true',
+        secure: true,
         httpOnly: true,
     });
     cookies.delete('hashedPassword', {
         domain: COOKIES_DOMAIN,
         path: '/',
-        secure: COOKIES_SECURE === 'true',
+        secure: true,
         httpOnly: true,
     });
 
