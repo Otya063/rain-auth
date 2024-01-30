@@ -1,0 +1,34 @@
+@charset "UTF-8";
+
+@use 'pc' as *;
+@use 'sp' as *;
+@use '../global' as *;
+
+/*==================================
+　　　　　初期設定
+==================================*/
+// スクロール禁止
+.fixed {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    height: auto;
+    -webkit-text-size-adjust: 100%;
+}
+
+.disable_default_wrapper {
+    display: block !important;
+}
+
+.wrapper_error {
+    display: grid;
+    grid-template: 'header' auto 'contents' 1fr 'footer' auto;
+    row-gap: 40px;
+    min-height: 100vh;
+    background: #fef5e6;
+    user-select: none;
+    justify-items: center;
+    align-items: center;
+}

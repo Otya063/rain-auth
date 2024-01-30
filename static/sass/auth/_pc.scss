@@ -1,0 +1,736 @@
+@charset "UTF-8";
+@use '../global/' as *;
+
+@include pc() {
+    /* ヘッダー
+====================================================*/
+
+    // ヘッダー帯
+    header {
+        position: relative;
+        background: #000;
+        width: 100%;
+        height: 73px;
+        grid-area: header;
+
+        // ヘッダー帯下部装飾
+        &::after {
+            display: block;
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0.2vw;
+            background: rgb(190, 193, 195);
+        }
+
+        // ヘッダー内部
+        .header_inner {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+
+            // プラットフォーム
+            .header_platform {
+                position: relative;
+                width: 70px;
+                height: 70px;
+                cursor: auto;
+
+                // プラットフォーム画像
+                &::before {
+                    display: block;
+                    position: absolute;
+                    top: 0;
+                    left: 10%;
+                    content: '';
+                    width: 70px;
+                    aspect-ratio: 1 / 1;
+                    background: url(#{$path_img}/common/platform_pc.webp) no-repeat center center;
+                    background-size: auto 75%;
+                }
+            }
+
+            // 言語選択枠
+            .header_language_selector {
+                display: flex;
+                align-items: center;
+                justify-content: space-evenly;
+                color: #fff;
+                border: 2px solid #fff;
+                box-sizing: content-box;
+                position: relative;
+                transition: all 0.7s ease-in-out;
+                width: 150px;
+                height: 52px;
+                margin: 0.3%;
+                z-index: 2;
+
+                // 言語選択アクティブ時
+                &.lang_arrow_open {
+                    height: 30vh;
+                    background: rgb(0 0 0 / 85%);
+
+                    .lang_arrow {
+                        top: 14.5px;
+                        transform: rotate(-180deg);
+                    }
+                }
+
+                // 言語選択ホバー
+                &:hover {
+                    border-color: orangered;
+                }
+
+                // グローバルマーク
+                .global_mark {
+                    position: absolute;
+                    top: 11.5px;
+                    left: 9px;
+                    font-size: 3rem;
+                }
+
+                // 現在表示言語
+                .current_language {
+                    position: absolute;
+                    top: 11.5px;
+                    left: 50px;
+                    font-size: 2rem;
+                }
+
+                // 矢印
+                .lang_arrow {
+                    position: absolute;
+                    top: 11.5px;
+                    right: 8px;
+                    font-size: 2.6rem;
+                    padding-top: 2%;
+                    transition: all 0.5s ease-in-out;
+                }
+            }
+
+            // 言語選択欄
+            .language_select_area_list {
+                display: flex;
+                flex-direction: column;
+                z-index: 1;
+                width: 100%;
+                align-items: center;
+                padding-top: 28%;
+
+                // 各言語
+                .language_names {
+                    @include flex_center;
+                    flex-direction: column;
+                    color: #fff;
+                    margin-top: 15%;
+                    padding-bottom: 2%;
+                    position: relative;
+                    will-change: opacity;
+
+                    // 言語名初めのみ上部余白なし
+                    &:first-child {
+                        margin-top: 0;
+                    }
+
+                    // 言語名ホバー時
+                    &.lang_selected {
+                        color: orange;
+                    }
+
+                    // 言語名メイン
+                    .language_main_name {
+                        font-size: 1.9rem;
+                        transform: translateY(6%);
+                    }
+
+                    // 言語名サブ
+                    .language_sub_name {
+                        font-size: 1.2rem;
+                        transform: translateY(6%);
+                    }
+
+                    // 言語名選択時下線
+                    &::before {
+                        background: #ff701e;
+                        content: '';
+                        width: 100%;
+                        height: 2px;
+                        position: absolute;
+                        left: 0;
+                        bottom: 0;
+                        margin: auto;
+                        transform-origin: center top;
+                        transform: scale(0, 1);
+                        transition: transform 0.3s;
+                    }
+                    // +
+                    &:hover::before {
+                        transform-origin: center top;
+                        transform: scale(1, 1);
+                    }
+                }
+            }
+        }
+    }
+
+    /* メインインナー
+====================================================*/
+
+    // 背景画像
+    .background_img {
+        position: fixed;
+        background: url(/img/common/auth_background.webp) center center / cover no-repeat;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+
+        // ぼかし擬似要素
+        &::before {
+            content: '';
+            background-color: rgb(255 255 255 / 30%);
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+        }
+    }
+
+    // 本体
+    .main_inner {
+        position: relative;
+        width: 26%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        background: #f5f6f7;
+        border-radius: 10px;
+        box-shadow: 0 5px 10px 0 rgb(0 0 0 / 60%);
+        transition: all 1s ease-in-out;
+        grid-area: contents;
+
+        // タイトル位置調整
+        h1 {
+            position: absolute;
+            top: 5%;
+        }
+
+        // フォームエリア
+        .form_area {
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            // フォームアイテムグループ
+            .form_area_item {
+                position: relative;
+                width: 85%;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 0 5% 0%;
+
+                // インプット
+                .part_input {
+                    width: 100%;
+                    font-weight: 700;
+                    border: 1px solid grey;
+                    border-radius: 5px;
+
+                    // エラー赤枠
+                    &.error_input {
+                        border: 1px solid #ff0000;
+                    }
+
+                    // パスワード
+                    &#password,
+                    &#conf_password {
+                        padding-right: 12%;
+                    }
+                }
+
+                // 固定化インプット
+                .part_input_fixed {
+                    width: 100%;
+                    font-weight: 700;
+                    padding-left: 1%;
+                }
+
+                // インプットと他要素をまとめる時
+                .wrap_part_input {
+                    display: flex;
+                    width: 100%;
+                    align-items: center;
+                }
+
+                // ラベル
+                .part_label {
+                    margin-top: 7%;
+
+                    // 初めは余白なし
+                    &:first-child {
+                        margin-top: 0;
+                    }
+
+                    // 補足説明小さく
+                    span {
+                        font-size: 1.3rem;
+                    }
+                }
+
+                // ラベルと他要素をまとめる時
+                .wrap_part_label {
+                    margin-top: 8%;
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                    font-size: 1.5rem;
+                    justify-content: space-between;
+
+                    // チェック状態のチェックボックスアイコン
+                    #remember_me:checked {
+                        + label[for='remember_me'] {
+                            &::before {
+                                content: '\e2e6';
+                            }
+                        }
+                    }
+
+                    // 「ログイン情報を保存する」チェックボックス
+                    label[for='remember_me'] {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        white-space: nowrap;
+
+                        // チェックボックスアイコン
+                        &::before {
+                            font-family: 'Material Icons';
+                            content: '\e836';
+                            font-size: 2.1rem;
+                            padding-right: 3%;
+                        }
+                    }
+
+                    // パスワードを忘れたら
+                    .forgot_password {
+                        display: flex;
+                        align-items: center;
+
+                        // 矢印アイコン
+                        &::before {
+                            font-family: 'Material Icons';
+                            content: '\e5cc';
+                            font-size: 2.1rem;
+                        }
+                    }
+                }
+
+                // インプットなしラベル
+                .part_label_no_input {
+                    margin-top: 8%;
+
+                    // 初めは余白なし
+                    &:first-child {
+                        padding-top: 0;
+                    }
+
+                    // 補足説明小さく
+                    span {
+                        font-size: 1.3rem;
+                    }
+                }
+
+                // パスワード強度
+                .color_indicators {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    width: 100%;
+                    background-color: #d7d7d7;
+                    border-radius: 20px;
+                    margin-top: 2%;
+                    height: 5px;
+
+                    // 強度バー
+                    .color_indicators_bar {
+                        &:nth-child(1) {
+                            background-color: #ff346c;
+                            border-radius: 20px 0 0 20px;
+                        }
+                        &:nth-child(2) {
+                            background-color: #ffb122;
+                        }
+                        &:nth-child(3) {
+                            background-color: #fbfb0c;
+                        }
+                        &:nth-child(4) {
+                            background-color: #379b79;
+                            border-radius: 0 20px 20px 0;
+                        }
+                    }
+
+                    // パスワード強度リスト
+                    .strength_list {
+                        display: flex;
+                        opacity: 1;
+                        position: absolute;
+                        left: -90%;
+                        bottom: -50%;
+                        background-color: #e0f4ff;
+                        padding: 8%;
+                        border-radius: 15%;
+                        width: 90%;
+                        flex-direction: column;
+                        align-items: center;
+                        box-shadow: 2px 2px 4px gray;
+
+                        &:lang(en) {
+                            bottom: -40%;
+                        }
+
+                        // 吹き出し口
+                        &:before {
+                            content: '';
+                            position: absolute;
+                            top: 50%;
+                            left: 100%;
+                            margin-top: -15px;
+                            border: 15px solid transparent;
+                            border-left: 15px solid #e0f4ff;
+                            filter: drop-shadow(2px 2px 1px grey);
+                        }
+
+                        // パスワード強度リストアイテム
+                        .strength_list_item {
+                            display: flex;
+                            width: 100%;
+                            justify-content: flex-start;
+                            color: #e60505;
+                            font-size: 1.4rem;
+                            padding-top: 5%;
+
+                            .material-icons {
+                                padding-right: 5%;
+                            }
+
+                            // 有効
+                            &.valid {
+                                color: #15c723;
+                            }
+                        }
+                    }
+                }
+
+                // パスワード強度値
+                .password_strength_value {
+                    position: absolute;
+                    bottom: 3%;
+                    right: 7%;
+                    font-size: 1.5rem;
+                }
+
+                // パスワード表示/非表示
+                .hide_password {
+                    position: absolute;
+                    right: 8.5%;
+                }
+
+                // テキストのみ
+                &.textbox {
+                    align-items: center;
+                    text-align: center;
+                    padding: 0;
+
+                    p {
+                        font-size: 1.5rem;
+                    }
+                }
+            }
+
+            // フォームエリア内メッセージのみの時（ボタン + 擬似要素）
+            button.form_area_msg_only {
+                display: flex;
+                align-items: center;
+                padding: 5%;
+                font-size: 1.5rem;
+
+                &::before {
+                    font-family: 'Material Icons';
+                    content: '\e5cc';
+                    font-size: 2.1rem;
+                }
+            }
+        }
+
+        // ボックスグループ
+        .box_group {
+            display: flex;
+            padding-top: 10%;
+            height: 205px;
+
+            // ボックス本体
+            .box {
+                position: relative;
+                border: 10px groove #999;
+                background-color: #ffffffc7;
+                color: #333;
+                width: calc(50% - 20px);
+                margin: 0 10px;
+                z-index: 2;
+            }
+
+            // ボックスタイトル
+            .box_title {
+                position: absolute;
+                display: inline-block;
+                top: -23%;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 0 4% 1%;
+                background-color: #fff;
+                border: #a19e9e 2px solid;
+                white-space: nowrap;
+            }
+
+            // ボックス中身
+            .box_body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 3%;
+                height: 100%;
+
+                img {
+                    width: 50%;
+                }
+
+                p {
+                    padding-top: 3%;
+                }
+            }
+        }
+
+        // 認証画面お知らせ共通
+        &.auth_notice {
+            padding: 75px 0 65px;
+        }
+
+        // 認証画面共通
+        &.auth_verify {
+            padding: 105px 0 90px;
+        }
+
+        // 無料会員登録ページ（ステージ１）
+        &.register_stage1 {
+            padding: 90px 0 60px;
+        }
+
+        // 無料会員登録ページ（ステージ２）
+        &.register_stage2 {
+            padding: 90px 0 70px;
+        }
+
+        // 無料会員登録完了ページ（ステージ３）
+        &.register_done_stage3 {
+            padding: 85px 0 40px;
+        }
+
+        // ログインページ
+        &.login {
+            padding: 80px 0 55px;
+        }
+
+        // パスワード再設定ページ（ステージ３）
+        &.reset_password_stage3 {
+            padding: 90px 0;
+        }
+
+        // パスワード再設定ページ（ステージ４）
+        &.reset_password_stage4 {
+            padding: 95px 0 60px;
+        }
+
+        // ディスコードアカウント連携ページ（ステージ３）
+        &.link_discord_done_stage3 {
+            padding: 90px 0 80px;
+        }
+
+        // ディスコードアカウント連携ページ（ステージ４）
+        &.link_discord_done_stage4 {
+            padding: 100px 0 90px;
+        }
+
+        // ディスコードアカウント連携ページ（ステージ５）
+        &.link_discord_done_stage5 {
+            width: 30%;
+            padding: 90px 0 40px;
+        }
+    }
+
+    /* フッター
+====================================================*/
+    // フッター帯
+    footer {
+        width: 100%;
+        position: relative;
+        background: #000;
+        grid-area: footer;
+
+        // フッター帯上部装飾
+        &::before {
+            display: block;
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 0.2vw;
+            background: rgb(190, 193, 195);
+        }
+
+        // フッター内コンテンツ調整
+        .footer_inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7% 2% 0.5%;
+
+            // フッターロゴ
+            .footer_logo {
+                width: 133px;
+            }
+
+            // フッターテキスト
+            .footer_text {
+                color: white;
+                font-size: 1.1rem;
+                text-align: end;
+
+                &:lang(en) {
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+
+    /* ボタン関連
+====================================================*/
+    // 青色ボタン
+    .blue_btn {
+        position: absolute;
+        bottom: 5%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0aa0d2;
+        width: fit-content;
+        background: #fff;
+        border: 1px solid #0aa0d2;
+        font-weight: 700;
+        font-size: 1.6rem;
+        border-radius: 4px;
+        transition: all 0.5s;
+
+        // ボタンアイコン
+        .btn_icon {
+            padding: 5px 5px 4px 10px;
+
+            &:lang(en) {
+                padding: 7px 5px 4px 10px;
+            }
+        }
+
+        // ボタンテキスト
+        .btn_text {
+            padding: 5px 13px 6px 0px;
+
+            &:lang(en) {
+                padding: 7px 13px 4px 0px;
+            }
+        }
+
+        &.active,
+        &:hover {
+            color: #fff;
+            background: #2abcec;
+            border: 1px solid #2abcec;
+        }
+
+        // ロード中
+        &.loading_btn {
+            border-radius: 50%;
+        }
+    }
+
+    // ボタンロード中
+    .loading {
+        @include authLoaderKey;
+        width: 24px;
+        height: 24px;
+        margin: 10px;
+        border-radius: 50%;
+        border: 0.25rem solid rgb(79 79 79 / 20%);
+        border-top-color: black;
+        animation: authLoaderAni 1s infinite linear;
+    }
+
+    /* その他
+====================================================*/
+
+    // エラー表示
+    .err_display {
+        @include right_left;
+        top: auto;
+        bottom: 105%;
+        display: flex;
+        align-items: center;
+        background: #21212a;
+        color: red;
+        padding: 3% 4%;
+        border-left: 4px solid #c93a3a;
+        width: 100%;
+
+        .material-icons {
+            padding-right: 3%;
+        }
+
+        // エラーテキスト表示
+        .err_text {
+            font-size: 1.5rem;
+        }
+
+        // 注意表示
+        &.warning {
+            color: #c7c93a;
+            border-left: 4px solid #c7c93a;
+        }
+    }
+
+    // 連携済みアイコン
+    .link_icon {
+        @include right_left;
+        top: 55%;
+        left: 42.5%;
+        width: 15%;
+        stroke: grey;
+        stroke-width: 0.5px;
+
+        &.link_icon1 {
+            fill: #62b340;
+            transform: rotate(225deg);
+            z-index: 1;
+        }
+
+        &.link_icon2 {
+            fill: #56ed17;
+            transform: rotate(45deg);
+            z-index: 3;
+        }
+    }
+}

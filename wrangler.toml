@@ -1,0 +1,14 @@
+main = "./.cloudflare/worker.js"
+site.bucket = "./.cloudflare/public"
+
+build.command = "npm run build"
+
+compatibility_date = "2021-11-12"
+workers_dev = true
+
+[placement]
+mode = "smart"
+
+[vars]
+MAINTENANCE_MODE = "false"
+MAINTENANCE_DATE = ""

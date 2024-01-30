@@ -1,0 +1,218 @@
+@charset "UTF-8";
+@use '../global/' as *;
+
+@include sp() {
+    /* メインインナー
+====================================================*/
+
+    // インナー調整
+    .main_inner_error {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        grid-area: contents;
+
+
+        // コケ猫
+        .ouch_cat {
+            width: 75%;
+            background-size: 100%;
+
+            @include landscape {
+                width: 60%;
+            }
+        }
+
+        // 配達猫
+        .delivery_cat {
+            width: 75%;
+            filter: drop-shadow(6px 6px 5px rgba(0, 0, 0, 0.5));
+
+            @include landscape {
+                width: 60%;
+            }
+        }
+
+        // タイトル
+        .h1_error {
+            position: relative;
+            font-size: 2rem;
+            font-weight: 600;
+            padding: 10% 2% 2%;
+
+            &:lang(en) {
+                font-size: 2.5rem;
+            }
+
+            @include landscape {
+                font-size: 2.5rem;
+
+                &:lang(en) {
+                    font-size: 3.4rem;
+                }
+            }
+
+            &::before {
+                content: '';
+                @include right_left;
+                bottom: 0;
+                top: auto;
+                width: 120%;
+                height: 3px;
+                margin: 0 auto;
+                text-align: center;
+                background-image: -webkit-linear-gradient(left, transparent, #000 25%, #000 75%, transparent);
+                background-image: linear-gradient(to right, transparent, #000 25%, #000 75%, transparent);
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+        }
+
+        // インナーテキスト
+        .inner_text_error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            font-size: 1.4rem;
+            padding: 15% 5% 0;
+
+            &:lang(en) {
+                font-size: 1.4rem;
+            }
+
+            @include landscape {
+                font-size: 1.6rem;
+                padding: 8% 8% 0;
+
+                &:lang(en) {
+                    font-size: 1.7rem;
+                }
+            }
+
+            // エラー原因
+            .error_cause {
+                width: fit-content;
+                margin: 10% 0;
+                position: relative;
+                padding: 3% 7%;
+                border-top: solid 2px black;
+                border-bottom: solid 2px black;
+                list-style: inside;
+
+                // 囲い装飾
+                &:before {
+                    content: '';
+                    position: absolute;
+                    top: -10px;
+                    width: 2px;
+                    height: -webkit-calc(100% + 20px);
+                    height: calc(100% + 20px);
+                    background-color: black;
+                    left: 10px;
+                }
+                // +
+                &:after {
+                    content: '';
+                    position: absolute;
+                    top: -10px;
+                    width: 2px;
+                    height: -webkit-calc(100% + 20px);
+                    height: calc(100% + 20px);
+                    background-color: black;
+                    right: 10px;
+                }
+
+                // 原因リスト
+                li {
+                    text-align: start;
+                }
+            }
+        }
+
+        // 戻るボタン
+        .btn {
+            padding: 3% 8.5%;
+            margin-bottom: 4%;
+            border: 2px solid #17c3b2;
+            position: relative;
+            border-radius: 60px;
+            background-color: #17c3b2;
+            text-align: center;
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 0.3rem rgba(0, 0, 0, 0.6));
+            -webkit-filter: drop-shadow(0 0 0.3rem rgba(0, 0, 0, 0.6));
+            z-index: 1;
+            color: white;
+            font-weight: bold;
+
+            &:lang(en) {
+                font-size: 1.6rem;
+            }
+
+            &:hover {
+                background-color: white;
+                color: #17c3b2;
+            }
+
+            @include landscape {
+                padding: 2% 6%;
+            }
+        }
+    }
+
+    /* フッター
+====================================================*/
+    // フッター帯
+    footer {
+        width: 100%;
+        position: relative;
+        background: #000;
+        grid-area: footer;
+
+        // フッター帯上部装飾
+        &::before {
+            display: block;
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 4px;
+            background: rgb(190, 193, 195);
+        }
+
+        // フッター内コンテンツ調整
+        .footer_inner_error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3% 2%;
+
+            // フッターロゴ
+            .footer_logo_error {
+                width: 133px;
+
+                @include landscape {
+                    width: 150px;
+                }
+            }
+
+            // フッターテキスト
+            .footer_text_error {
+                width: 90%;
+                color: white;
+                font-size: 1.1rem;
+                text-align: center;
+                border-top: 2px solid #524c4c;
+                margin-top: 2%;
+                padding-top: 2%;
+
+                &:lang(en) {
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+}

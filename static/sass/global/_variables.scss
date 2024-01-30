@@ -1,0 +1,24 @@
+@charset "UTF-8";
+
+// フォントファミリー（汎用）
+$font_ja: 'Noto Sans JP', sans-serif;
+$font_en: 'Roboto', 'Open Sans', sans-serif;
+
+// フォントファミリー（タイトル用）
+$font_title_ja: 'Noto Serif JP', serif;
+$font_title_en: 'Noto Serif', serif;
+
+// 画像ルートパス
+$path_img: '/img';
+
+// インフォタイプ別色マップ
+$infoColorMap: (
+    important: #f9cb00,
+    defects_and_troubles: #cb0029,
+    management_and_service: #3e4cc5,
+    in-game_events: #5ee5de,
+    updates_and_maintenance: #c76715,
+);
+
+// 武器種名
+$weaponNamesArray: GreatSword, HeavyBowgun, Hammer, Lance, SwordAndShield, LightBowgun, DualSwords, LongSword, HuntingHorn, Gunlance, Bow, Tonfa, SwitchAxeF, MagnetSpike, new;

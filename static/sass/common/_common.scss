@@ -1,0 +1,146 @@
+@charset "UTF-8";
+@use '../global/' as *;
+
+html {
+    height: auto;
+    font-size: 62.5%;
+}
+
+body {
+    font-size: 1.6rem;
+    font-family: $font_ja;
+    color: #333;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+
+    &:lang(en) {
+        font-family: $font_en;
+    }
+
+    // スクロール無効
+    &.noscroll {
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+    }
+}
+
+// Google Font アイコン用
+.material-icons,
+.material-symbols-outlined {
+    user-select: none;
+}
+
+// 画像初期設定
+img {
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+}
+
+// aタグ装飾削除
+a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    &:visited {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
+// ボタン装飾削除
+button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+// カーソルポインター
+.pointer {
+    cursor: pointer;
+}
+
+// selectタグ余白調整
+select {
+    padding: 0 19px 0 6px;
+    outline: 0;
+}
+
+// inputテキスト余白調整
+input[type='text'],
+input[type='password'],
+input[type='number'] {
+    padding: 4px 6px;
+    outline: 0;
+    font-size: 1.4rem;
+}
+
+// input日付余白/クリック範囲調整
+input[type='date'],
+input[type='datetime-local'] {
+    position: relative;
+    padding: 0 6px;
+}
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='datetime-local']::-webkit-calendar-picker-indicator {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+// 一括入力待機中無効
+img,
+button,
+picture {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+// 個別入力待機中無効
+.no_select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+// 表右側ボーダー無し
+.no_border_right {
+    border-right: 0px !important;
+}
+
+// タイトルフォント
+h1,
+h2 {
+    font-family: $font_title_ja;
+
+    &:lang(en) {
+        font-family: $font_title_en;
+    }
+}
+
+// 要素無効化
+.disabled_elm {
+    opacity: 0.6;
+    pointer-events: none;
+}

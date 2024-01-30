@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+    <url>
+        <loc>https://auth.rain-server.com/ja/login/</loc>
+        <lastmod>2024-01-16T03:21:02+00:00</lastmod>
+    </url>
+    <url>
+        <loc>https://auth.rain-server.com/en/login/</loc>
+        <lastmod>2024-01-16T03:21:37+00:00</lastmod>
+    </url>
+    <url>
+        <loc>https://auth.rain-server.com/ja/register/</loc>
+        <lastmod>2024-01-16T03:19:00+00:00</lastmod>
+    </url>
+    <url>
+        <loc>https://auth.rain-server.com/en/register/</loc>
+        <lastmod>2024-01-16T03:20:14+00:00</lastmod>
+    </url>
+</urlset>
