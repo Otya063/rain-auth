@@ -5,6 +5,7 @@ build.command = "npm run build"
 
 compatibility_date = "2021-11-12"
 workers_dev = true
+logpush = true
 
 [placement]
 mode = "smart"
