@@ -148,7 +148,7 @@ type RootTranslation = {
 		 */
 		haveAccount: string
 		/**
-		 * A​c​c​o​u​n​t​ ​c​r​e​a​t​i​o​n​ ​a​n​d​ ​d​i​s​c​o​r​d​ ​l​i​n​k​i​n​g​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​c​o​m​p​l​e​t​e​d​.​<​b​r​>​Y​o​u​ ​m​a​y​ ​c​l​o​s​e​ ​t​h​i​s​ ​p​a​g​e​.
+		 * A​c​c​o​u​n​t​ ​c​r​e​a​t​i​o​n​ ​a​n​d​ ​d​i​s​c​o​r​d​ ​l​i​n​k​i​n​g​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​c​o​m​p​l​e​t​e​d​.​<​b​r​>​F​e​e​l​ ​f​r​e​e​ ​t​o​ ​c​l​o​s​e​ ​t​h​i​s​ ​b​r​o​w​s​e​r​ ​w​i​n​d​o​w​.
 		 */
 		doneRegister: string
 		/**
@@ -325,7 +325,7 @@ type RootTranslation = {
 			'2': string
 		}
 		/**
-		 * T​h​e​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​l​i​n​k​e​d​.​<​b​r​>​Y​o​u​ ​m​a​y​ ​c​l​o​s​e​ ​t​h​i​s​ ​p​a​g​e​.
+		 * T​h​e​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​l​i​n​k​e​d​.​<​b​r​>​F​e​e​l​ ​f​r​e​e​ ​t​o​ ​c​l​o​s​e​ ​t​h​i​s​ ​b​r​o​w​s​e​r​ ​w​i​n​d​o​w​.
 		 */
 		doneLinkDiscord: string
 		/**
@@ -531,6 +531,14 @@ type RootTranslation = {
 			 * F​a​i​l​e​d​ ​t​o​ ​r​e​g​i​s​t​e​r​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​s​:
 			 */
 			failedRegisterMsg1: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​u​s​e​r​ ​d​a​t​a​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​s​:
+			 */
+			failedCreateUser: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​c​h​a​r​a​c​t​e​r​ ​d​a​t​a​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​s​:
+			 */
+			failedCreateCharacter: string
 		}
 		login: {
 			/**
@@ -723,7 +731,7 @@ export type TranslationFunctions = {
 		 */
 		haveAccount: () => LocalizedString
 		/**
-		 * Account creation and discord linking has been successfully completed.<br>You may close this page.
+		 * Account creation and discord linking has been successfully completed.<br>Feel free to close this browser window.
 		 */
 		doneRegister: () => LocalizedString
 		/**
@@ -898,7 +906,7 @@ export type TranslationFunctions = {
 			'2': () => LocalizedString
 		}
 		/**
-		 * The discord account has been successfully linked.<br>You may close this page.
+		 * The discord account has been successfully linked.<br>Feel free to close this browser window.
 		 */
 		doneLinkDiscord: () => LocalizedString
 		/**
@@ -1104,6 +1112,14 @@ export type TranslationFunctions = {
 			 * Failed to register for the following reasons:
 			 */
 			failedRegisterMsg1: () => LocalizedString
+			/**
+			 * Failed to create user data for the following reasons:
+			 */
+			failedCreateUser: () => LocalizedString
+			/**
+			 * Failed to create character data for the following reasons:
+			 */
+			failedCreateCharacter: () => LocalizedString
 		}
 		login: {
 			/**
