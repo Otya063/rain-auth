@@ -67,8 +67,8 @@ model characters {
   user_id                                                        Int?
   is_female                                                      Boolean?
   is_new_character                                               Boolean?
-  name                                                           String?              @default("") @db.VarChar(15)
-  unk_desc_string                                                String?              @default("") @db.VarChar(31)
+  name                                                           String?
+  unk_desc_string                                                String?
   gr                                                             Int?
   hrp                                                            Int?
   weapon_type                                                    Int?
