@@ -168,6 +168,8 @@ const en: BaseTranslation = {
 
         register: {
             failedRegisterMsg1: 'Failed to register for the following reasons:',
+            failedCreateUser: 'Failed to create user data for the following reasons:',
+            failedCreateCharacter: 'Failed to create character data for the following reasons:',
         },
 
         login: {

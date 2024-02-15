@@ -20,7 +20,73 @@ export const db = new PrismaClient({
             url: DATABASE_URL,
         },
     },
-}).$extends(withAccelerate());
+})
+    .$extends(withAccelerate())
+    .$extends({
+        model: {
+            users: {
+                async add(
+                    username: string,
+                    password: string
+                ): Promise<{
+                    success: boolean;
+                    message: string;
+                    userId?: number;
+                }> {
+                    try {
+                        const userId = (
+                            (await db.$queryRaw`INSERT INTO users (username, password, return_expires) VALUES(${username}, ${password}, ${Math.floor(Date.now() / 1000)}) RETURNING id;`) as [
+                                { id: number }
+                            ]
+                        )[0].id;
+
+                        return {
+                            success: true,
+                            message: '',
+                            userId,
+                        };
+                    } catch (err) {
+                        if (err instanceof Error) {
+                            return { success: false, message: err.message };
+                        } else if (typeof err === 'string') {
+                            return { success: false, message: err };
+                        } else {
+                            return { success: false, message: '' };
+                        }
+                    }
+                },
+            },
+            characters: {
+                async add(userId: number): Promise<{
+                    success: boolean;
+                    message: string;
+                    charId?: number;
+                }> {
+                    try {
+                        const charId = (
+                            (await db.$queryRaw`INSERT INTO characters (user_id, is_female, is_new_character, name, unk_desc_string, hrp, gr, weapon_type, last_login) VALUES(${userId}, '0', '1', '', '', 0, 0, 0, ${Math.floor(
+                                Date.now() / 1000
+                            )}) RETURNING id;`) as [{ id: number }]
+                        )[0].id;
+
+                        return {
+                            success: true,
+                            message: '',
+                            charId,
+                        };
+                    } catch (err) {
+                        if (err instanceof Error) {
+                            return { success: false, message: err.message };
+                        } else if (typeof err === 'string') {
+                            return { success: false, message: err };
+                        } else {
+                            return { success: false, message: '' };
+                        }
+                    }
+                },
+            },
+        },
+    });
 
 class ServerDataManager {
     /* Characters

@@ -167,6 +167,8 @@ const ja: Translation = {
 
         register: {
             failedRegisterMsg1: '次のような理由により、会員登録に失敗しました。',
+            failedCreateUser: '次のような理由により、ユーザーデータの作成に失敗しました。',
+            failedCreateCharacter: '次のような理由により、キャラクターデータの作成に失敗しました。',
         },
 
         login: {

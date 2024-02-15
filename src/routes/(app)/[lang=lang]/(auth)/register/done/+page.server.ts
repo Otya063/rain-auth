@@ -185,44 +185,42 @@ const register: Action = async ({ url, request, locals: { LL } }) => {
 
             try {
                 // create user account
-                const createdUser = await db.users.create({
-                    data: {
-                        username: fetchData.username,
-                        password: fetchData.hashed_password,
-                    },
-                });
+                const { success, message, userId } = await db.users.add(fetchData.username, fetchData.hashed_password);
+                if (!success || !userId) {
+                    throw error(400, {
+                        message: '',
+                        message1: LL.error['register'].failedCreateUser(),
+                        message2: [message],
+                        message3: LL.error['startOverMsg3'](),
+                    });
+                } else {
+                    // create new character
+                    const { success, message, charId } = await db.characters.add(userId);
+                    if (!success || !charId) {
+                        throw error(400, {
+                            message: '',
+                            message1: LL.error['register'].failedCreateCharacter(),
+                            message2: [message],
+                            message3: LL.error['startOverMsg3'](),
+                        });
+                    } else {
+                        // link discord
+                        await db.discord.create({
+                            data: {
+                                char_id: charId,
+                                discord_id: fetchData.discord_id,
+                            },
+                        });
+                        await db.discord_register.create({
+                            data: {
+                                user_id: userId,
+                                discord_id: fetchData.discord_id,
+                            },
+                        });
 
-                const userId = createdUser.id;
-
-                const lastLoginTime = Math.floor(Date.now() / 1000);
-
-                // create first character
-                const createdChar = await db.characters.create({
-                    data: {
-                        user_id: userId,
-                        is_female: false,
-                        is_new_character: true,
-                        last_login: lastLoginTime,
-                    },
-                });
-
-                const charId = createdChar.id;
-
-                // link discord
-                await db.discord.create({
-                    data: {
-                        char_id: charId,
-                        discord_id: fetchData.discord_id,
-                    },
-                });
-                await db.discord_register.create({
-                    data: {
-                        user_id: userId,
-                        discord_id: fetchData.discord_id,
-                    },
-                });
-
-                return { currentStage: 2, nextStage: 3 };
+                        return { currentStage: 2, nextStage: 3 };
+                    }
+                }
             } catch (err) {
                 if (err instanceof Error) {
                     throw error(400, { message: '', message1: LL.error['register'].failedRegisterMsg1(), message2: [err.message], message3: LL.error['startOverMsg3']() });
