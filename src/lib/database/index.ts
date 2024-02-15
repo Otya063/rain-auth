@@ -13,6 +13,7 @@ import { withAccelerate } from '@prisma/extension-accelerate';
 import { DATABASE_URL } from '$env/static/private';
 import type { InformationType } from '$lib/types';
 import _ from 'lodash';
+import { DateTime } from 'luxon';
 
 export const db = new PrismaClient({
     datasources: {
@@ -35,7 +36,7 @@ export const db = new PrismaClient({
                 }> {
                     try {
                         const userId = (
-                            (await db.$queryRaw`INSERT INTO users (username, password, return_expires) VALUES(${username}, ${password}, ${Math.floor(Date.now() / 1000)}) RETURNING id;`) as [
+                            (await db.$queryRaw`INSERT INTO users (username, password, return_expires) VALUES(${username}, ${password}, ${DateTime.fromJSDate(new Date()).toString()!}) RETURNING id;`) as [
                                 { id: number }
                             ]
                         )[0].id;
