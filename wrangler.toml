@@ -11,5 +11,5 @@ logpush = true
 mode = "smart"
 
 [vars]
-MAINTENANCE_MODE = "true"
+MAINTENANCE_MODE = "false"
 MAINTENANCE_DATE = ""

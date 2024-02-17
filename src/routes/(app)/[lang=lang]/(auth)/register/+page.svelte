@@ -159,7 +159,14 @@
 
         <Turnstile siteKey={PUBLIC_TURNSTILE_SITE_KEY} />
 
-        <button id="btn" class="blue_btn" type="submit">
+        <button
+            id="btn"
+            class="blue_btn"
+            type="button"
+            on:submit={() => {
+                return false;
+            }}
+        >
             {#if btnStage === 0}
                 <span in:fade class="loading"></span>
             {:else if btnStage === 1}

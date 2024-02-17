@@ -75,7 +75,7 @@
                         {#each Object.entries($LL.error[403].message2) as [_, cause]}
                             <li>{cause()}</li>
                         {/each}
-                    {:else if status === 400 || status === 500}
+                    {:else if (status === 400 || status === 500) && !!$page.error?.message}
                         <li>{$page.error?.message}</li>
                     {:else}
                         <li>{$LL.error['otherMessage2']()}</li>
@@ -139,7 +139,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <!-- mobile -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-capable" content="yes" />

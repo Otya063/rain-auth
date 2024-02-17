@@ -63,7 +63,7 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
         } else if (typeof err === 'string') {
             throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
         } else {
-            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [''], message3: LL.error['startOverMsg3']() });
+            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
         }
     }
 
@@ -175,7 +175,7 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
                 } else if (typeof err === 'string') {
                     throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
                 } else {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [''], message3: LL.error['startOverMsg3']() });
+                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
                 }
             }
 
@@ -235,7 +235,7 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
                 } else if (typeof err === 'string') {
                     throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
                 } else {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [''], message3: LL.error['startOverMsg3']() });
+                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
                 }
             }
 
@@ -308,7 +308,7 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
                 } else if (typeof err === 'string') {
                     throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [err], message3: LL.error['startOverMsg3']() });
                 } else {
-                    throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [''], message3: LL.error['startOverMsg3']() });
+                    throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: undefined, message3: LL.error['startOverMsg3']() });
                 }
             }
         }
