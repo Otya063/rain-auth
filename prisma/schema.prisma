@@ -3,10 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
-  directUrl    = env("DIRECT_URL")
-  relationMode = "prisma"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model achievements {
@@ -46,12 +45,33 @@ model achievements {
   ach32 Int? @default(0)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model blog {
+  id            Int     @id @default(autoincrement())
+  title         String  @db.VarChar(255)
+  thumbnail_url String? @db.VarChar(255)
+  discord_name  String  @db.VarChar(255)
+  avatar_url    String  @db.VarChar(255)
+  content       String?
+  created       Int
+  category      String  @db.VarChar(255)
+}
+
+model bounty {
+  id           Int     @id @default(autoincrement())
+  title        String  @db.VarChar(255)
+  explain      String? @db.VarChar(255)
+  solo_point   Int
+  multi_point  Int
+  solo_ticket  Int
+  multi_ticket Int
+  cooldown     Int
+}
+
 model cafe_accepted {
   cafe_id      Int
   character_id Int
 
-  @@ignore
+  @@id([cafe_id, character_id])
 }
 
 model cafebonus {
@@ -67,8 +87,8 @@ model characters {
   user_id                                                        Int?
   is_female                                                      Boolean?
   is_new_character                                               Boolean?
-  name                                                           String?
-  unk_desc_string                                                String?
+  name                                                           String?              @db.VarChar(15)
+  unk_desc_string                                                String?              @db.VarChar(31)
   gr                                                             Int?
   hrp                                                            Int?
   weapon_type                                                    Int?
@@ -100,9 +120,8 @@ model characters {
   friends                                                        String               @default("")
   blocked                                                        String               @default("")
   deleted                                                        Boolean              @default(false)
-  cafe_time                                                      Int?                 @default(0)
-  netcafe_points                                                 Int?                 @default(0)
   boost_time                                                     DateTime?            @db.Timestamptz(6)
+  netcafe_points                                                 Int?                 @default(0)
   cafe_reset                                                     DateTime?            @db.Timestamptz(6)
   bonus_quests                                                   Int                  @default(0)
   daily_quests                                                   Int                  @default(0)
@@ -111,24 +130,23 @@ model characters {
   pact_id                                                        Int?
   stampcard                                                      Int                  @default(0)
   mezfes                                                         Bytes?
+  cafe_time                                                      Int?                 @default(0)
   users                                                          users?               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  discord                                                        discord?
+  distribution                                                   distribution[]
   guild_applications_guild_applications_actor_idTocharacters     guild_applications[] @relation("guild_applications_actor_idTocharacters")
   guild_applications_guild_applications_character_idTocharacters guild_applications[] @relation("guild_applications_character_idTocharacters")
   guild_characters                                               guild_characters?
-  mail_mail_recipient_idTocharacters                             mail[]               @relation("mail_recipient_idTocharacters")
-  mail_mail_sender_idTocharacters                                mail[]               @relation("mail_sender_idTocharacters")
-  discord                                                        discord?
-  rengoku_score_rengoku_score_character_idTocharacters           rengoku_score[]      @relation("rengoku_score_character_idTocharacters")
-  warehouse_warehouse_character_idTocharacters                   warehouse[]          @relation("warehouse_character_idTocharacters")
-  distribution_distribution_character_idTocharacters             distribution[]       @relation("distribution_character_idTocharacters")
-
-  @@index([user_id])
+  mail                                                           mail[]
+  rengoku_score                                                  rengoku_score?
+  shop_items_bought                                              shop_items_bought[]
+  warehouse                                                      warehouse?
 }
 
 model discord {
   id                 Int        @id @default(autoincrement())
   char_id            Int        @unique
-  discord_id         String     @db.VarChar(255)
+  discord_id         String     @unique(map: "discord_unique") @db.VarChar(255)
   is_male            Boolean?   @default(true)
   bounty             Int        @default(0)
   road_champion      Boolean    @default(false)
@@ -148,46 +166,48 @@ model discord {
   silver             Int?       @default(0)
   bronze             Int?       @default(0)
   characters         characters @relation(fields: [char_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@index([char_id])
 }
 
 model discord_register {
-  id                                    Int       @id @default(autoincrement())
-  discord_id                            String?   @db.VarChar(32)
-  user_id                               Int
-  created_at                            DateTime? @default(now()) @db.Timestamp(6)
-  users_discord_register_user_idTousers users     @relation("discord_register_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@index([user_id])
+  id         Int       @id @default(autoincrement())
+  discord_id String?   @unique @db.VarChar(32)
+  user_id    Int       @unique
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model distribution {
-  id                                               Int         @id @default(autoincrement())
-  character_id                                     Int?
-  type                                             Int
-  deadline                                         DateTime?   @db.Timestamptz(6)
-  event_name                                       String      @default("GM Gift!")
-  description                                      String      @default("~C05You received a gift!")
-  times_acceptable                                 Int         @default(1)
-  min_hr                                           Int         @default(65535)
-  max_hr                                           Int         @default(65535)
-  min_sr                                           Int         @default(65535)
-  max_sr                                           Int         @default(65535)
-  min_gr                                           Int         @default(65535)
-  max_gr                                           Int         @default(65535)
-  data                                             Bytes
-  characters_distribution_character_idTocharacters characters? @relation("distribution_character_idTocharacters", fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@index([character_id])
+  id               Int         @id @default(autoincrement())
+  character_id     Int?
+  type             Int
+  deadline         DateTime?   @db.Timestamptz(6)
+  event_name       String      @default("GM Gift!")
+  description      String      @default("~C05You received a gift!")
+  times_acceptable Int         @default(1)
+  min_hr           Int         @default(65535)
+  max_hr           Int         @default(65535)
+  min_sr           Int         @default(65535)
+  max_sr           Int         @default(65535)
+  min_gr           Int         @default(65535)
+  max_gr           Int         @default(65535)
+  data             Bytes
+  bot              Boolean     @default(false)
+  characters       characters? @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model distributions_accepted {
-  distribution_id Int?
-  character_id    Int?
+  distribution_id Int
+  character_id    Int
 
-  @@ignore
+  @@id([character_id, distribution_id])
+}
+
+model event_quests {
+  id          Int  @id @default(autoincrement())
+  max_players Int?
+  quest_type  Int
+  quest_id    Int
+  mark        Int?
 }
 
 model events {
@@ -196,12 +216,11 @@ model events {
   start_time DateTime   @default(now()) @db.Timestamptz(6)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model feature_weapon {
   start_time DateTime @db.Timestamptz(6)
   featured   Int
 
-  @@ignore
+  @@id([start_time, featured])
 }
 
 model festa_prizes {
@@ -257,7 +276,7 @@ model gacha_box {
 }
 
 model gacha_entries {
-  id              Int  @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
   gacha_id        Int?
   entry_type      Int?
   item_type       Int?
@@ -268,6 +287,7 @@ model gacha_entries {
   rolls           Int?
   frontier_points Int?
   daily_limit     Int?
+  name            String?
 }
 
 model gacha_items {
@@ -301,13 +321,13 @@ model gacha_stepup {
   @@ignore
 }
 
-model gook {
-  id    Int    @id @default(autoincrement())
-  gook0 Bytes?
-  gook1 Bytes?
-  gook2 Bytes?
-  gook3 Bytes?
-  gook4 Bytes?
+model goocoo {
+  id      Int    @id(map: "gook_pkey") @default(autoincrement())
+  goocoo0 Bytes?
+  goocoo1 Bytes?
+  goocoo2 Bytes?
+  goocoo3 Bytes?
+  goocoo4 Bytes?
 }
 
 model guild_adventures {
@@ -342,8 +362,6 @@ model guild_applications {
 
   @@unique([guild_id, character_id], map: "guild_application_character_id")
   @@index([application_type], map: "guild_application_type_index")
-  @@index([actor_id])
-  @@index([character_id])
 }
 
 model guild_characters {
@@ -357,25 +375,37 @@ model guild_characters {
   souls            Int?        @default(0)
   rp_today         Int?        @default(0)
   rp_yesterday     Int?        @default(0)
+  tower_mission_1  Int?
+  tower_mission_2  Int?
+  tower_mission_3  Int?
+  box_claimed      DateTime?   @default(now()) @db.Timestamptz(6)
+  treasure_hunt    Int?
   characters       characters? @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   guilds           guilds?     @relation(fields: [guild_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@index([guild_id])
 }
 
 model guild_hunts {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   guild_id    Int
   host_id     Int
   destination Int
   level       Int
   return      Int
-  acquired    Boolean @default(false)
-  claimed     Boolean @default(false)
-  hunters     String  @default("")
-  treasure    String  @default("")
+  acquired    Boolean  @default(false)
+  claimed     Boolean  @default(false)
+  hunters     String   @default("")
+  treasure    String   @default("")
   hunt_data   Bytes
   cats_used   String
+  start       DateTime @default(now()) @db.Timestamptz(6)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model guild_hunts_claimed {
+  hunt_id      Int
+  character_id Int
+
+  @@ignore
 }
 
 model guild_meals {
@@ -418,8 +448,18 @@ model guilds {
   pugi_outfit_2      Int                  @default(0)
   pugi_outfit_3      Int                  @default(0)
   pugi_outfits       Int                  @default(0)
+  tower_mission_page Int?                 @default(1)
+  tower_rp           Int?                 @default(0)
   guild_applications guild_applications[]
   guild_characters   guild_characters[]
+}
+
+model kill_logs {
+  id           Int      @id @default(autoincrement())
+  character_id Int
+  monster      Int
+  quantity     Int
+  timestamp    DateTime @db.Timestamptz(6)
 }
 
 model launcher_banner {
@@ -460,92 +500,204 @@ model login_boost {
 }
 
 model mail {
-  id                                       Int        @id @default(autoincrement())
-  sender_id                                Int
-  recipient_id                             Int
-  subject                                  String     @default("") @db.VarChar
-  body                                     String     @default("") @db.VarChar
-  read                                     Boolean    @default(false)
-  attached_item_received                   Boolean    @default(false)
-  attached_item                            Int?
-  attached_item_amount                     Int        @default(1)
-  is_guild_invite                          Boolean    @default(false)
-  created_at                               DateTime   @default(now()) @db.Timestamptz(6)
-  deleted                                  Boolean    @default(false)
-  locked                                   Boolean    @default(false)
-  characters_mail_recipient_idTocharacters characters @relation("mail_recipient_idTocharacters", fields: [recipient_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  characters_mail_sender_idTocharacters    characters @relation("mail_sender_idTocharacters", fields: [sender_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id                     Int        @id @default(autoincrement())
+  sender_id              Int
+  recipient_id           Int
+  subject                String     @default("") @db.VarChar
+  body                   String     @default("") @db.VarChar
+  read                   Boolean    @default(false)
+  attached_item_received Boolean    @default(false)
+  attached_item          Int?
+  attached_item_amount   Int        @default(1)
+  is_guild_invite        Boolean    @default(false)
+  created_at             DateTime   @default(now()) @db.Timestamptz(6)
+  deleted                Boolean    @default(false)
+  locked                 Boolean    @default(false)
+  is_sys_message         Boolean?   @default(false)
+  characters             characters @relation(fields: [recipient_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([recipient_id, deleted, created_at(sort: Desc), id(sort: Desc)], map: "mail_recipient_deleted_created_id_index")
-  @@index([sender_id])
+}
+
+model mezfes {
+  id                 Int     @id @default(autoincrement())
+  discord_id         String? @db.VarChar(255)
+  panic_honey        Int
+  guuku_scoop        Int
+  dokkan_battle_cats Int
+  nyanrendo          Int
+  uruki_pachinko     Int
+  total              Int
+}
+
+model raviregister {
+  id           Int  @id @default(autoincrement())
+  refid        Int
+  nextravi     Int
+  ravistarted  Int?
+  raviposttime Int?
+  ravitype     Int?
+  maxplayers   Int?
+  ravikilled   Int?
+  carvequest   Int?
+  register1    Int?
+  register2    Int?
+  register3    Int?
+  register4    Int?
+  register5    Int?
+}
+
+model ravistate {
+  id               Int  @id @default(autoincrement())
+  refid            Int
+  phase1hp         Int
+  phase2hp         Int?
+  phase3hp         Int?
+  phase4hp         Int?
+  phase5hp         Int?
+  phase6hp         Int?
+  phase7hp         Int?
+  phase8hp         Int?
+  phase9hp         Int?
+  unknown1         Int?
+  unknown2         Int?
+  unknown3         Int?
+  unknown4         Int?
+  unknown5         Int?
+  unknown6         Int?
+  unknown7         Int?
+  unknown8         Int?
+  unknown9         Int?
+  unknown10        Int?
+  unknown11        Int?
+  unknown12        Int?
+  unknown13        Int?
+  unknown14        Int?
+  unknown15        Int?
+  unknown16        Int?
+  unknown17        Int?
+  unknown18        Int?
+  unknown19        Int?
+  unknown20        Int?
+  damagemultiplier Int?
+}
+
+model ravisupport {
+  id        Int  @id @default(autoincrement())
+  refid     Int
+  support1  Int
+  support2  Int?
+  support3  Int?
+  support4  Int?
+  support5  Int?
+  support6  Int?
+  support7  Int?
+  support8  Int?
+  support9  Int?
+  support10 Int?
+  support11 Int?
+  support12 Int?
+  support13 Int?
+  support14 Int?
+  support15 Int?
+  support16 Int?
+  support17 Int?
+  support18 Int?
+  support19 Int?
+  support20 Int?
+  support21 Int?
+  support22 Int?
+  support23 Int?
+  support24 Int?
+  support25 Int?
 }
 
 model rengoku_score {
-  character_id                                      Int        @id
-  max_stages_mp                                     Int?
-  max_points_mp                                     Int?
-  max_stages_sp                                     Int?
-  max_points_sp                                     Int?
-  characters_rengoku_score_character_idTocharacters characters @relation("rengoku_score_character_idTocharacters", fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@index([character_id])
+  character_id  Int        @id
+  max_stages_mp Int?
+  max_points_mp Int?
+  max_stages_sp Int?
+  max_points_sp Int?
+  characters    characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model scenario_counter {
+  id          Int     @id @default(autoincrement())
+  scenario_id Decimal @db.Decimal
+  category_id Decimal @db.Decimal
+}
+
 model servers {
   server_id         Int
-  season            Int
+  season            Int?
   current_players   Int
-  world_name        String?
-  world_description String?
-  land              Int?
+  land              Int
+  world_name        String
+  world_description String
 
-  @@ignore
+  @@id([server_id, current_players, land, world_name, world_description])
 }
 
 model shop_items {
-  shop_type    Int?
-  shop_id      Int?
-  id           Int  @id @default(autoincrement())
-  item_id      Int?
-  cost         Int?
-  quantity     Int?
-  min_hr       Int?
-  min_sr       Int?
-  min_gr       Int?
-  store_level  Int?
-  max_quantity Int?
-  road_floors  Int?
-  road_fatalis Int?
+  shop_type    Int
+  shop_id      Int
+  id           Int @id @default(autoincrement())
+  item_id      Int
+  cost         Int
+  quantity     Int
+  min_hr       Int
+  min_sr       Int
+  min_gr       Int
+  store_level  Int
+  max_quantity Int
+  road_floors  Int
+  road_fatalis Int
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model shop_items_bought {
-  character_id Int?
-  shop_item_id Int?
-  bought       Int?
+  character_id Int
+  shop_item_id Int
+  bought       Int
+  characters   characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "shop_item_state_char_id_fkey")
 
-  @@ignore
+  @@id([character_id, shop_item_id, bought], map: "shop_item_state_pkey")
+  @@unique([character_id, shop_item_id], map: "shop_item_state_id_itemhash")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model sign_sessions {
-  user_id   Int
+  user_id   Int?
   char_id   Int?
-  token     String @db.VarChar(16)
+  token     String  @db.VarChar(16)
   server_id Int?
-
-  @@ignore
+  id        Int     @id @default(autoincrement())
+  psn_id    String?
 }
 
 model stamps {
-  character_id Int       @id
-  hl_total     Int?      @default(0)
-  hl_redeemed  Int?      @default(0)
-  hl_next      DateTime? @db.Timestamptz(6)
-  ex_total     Int?      @default(0)
-  ex_redeemed  Int?      @default(0)
-  ex_next      DateTime? @db.Timestamptz(6)
+  character_id Int      @id
+  hl_total     Int      @default(0)
+  hl_redeemed  Int      @default(0)
+  hl_next      DateTime @db.Timestamptz(6)
+  ex_total     Int      @default(0)
+  ex_redeemed  Int      @default(0)
+  ex_next      DateTime @db.Timestamptz(6)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model submitted {
+  id       Int     @default(autoincrement())
+  bbq      String? @db.VarChar(255)
+  type_b   Int     @default(1)
+  title    String? @db.VarChar(255)
+  cid      Int     @default(0)
+  team     String? @default("none")
+  cname    String? @default("none")
+  uname    String? @default("none")
+  t_submit Int
+  avatar   String? @db.VarChar(255)
+  url_i    String? @db.VarChar(255)
+
+  @@ignore
 }
 
 model suspended_account {
@@ -566,6 +718,23 @@ model titles {
   @@ignore
 }
 
+model tower {
+  char_id Int     @id
+  tr      Int?
+  trp     Int?
+  tsp     Int?
+  block1  Int?
+  block2  Int?
+  skills  String? @default("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+  gems    String? @default("0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")
+}
+
+model trend_weapons {
+  weapon_id   Int  @id
+  weapon_type Int
+  count       Int? @default(0)
+}
+
 model user_binary {
   id              Int     @id @default(autoincrement())
   type2           Bytes?
@@ -583,69 +752,70 @@ model user_binary {
 }
 
 model users {
-  id                                               Int                @id @default(autoincrement())
-  username                                         String             @unique
-  password                                         String
-  item_box                                         Bytes?
-  rights                                           Int                @default(12)
-  last_character                                   Int?               @default(0)
-  last_login                                       DateTime?          @db.Timestamptz(6)
-  return_expires                                   DateTime?          @db.Timestamptz(6)
-  gacha_premium                                    Int?
-  gacha_trial                                      Int?
-  frontier_points                                  Int?
-  web_login_key                                    String?
-  characters                                       characters[]
-  discord_register_discord_register_user_idTousers discord_register[] @relation("discord_register_user_idTousers")
+  id                   Int               @id @default(autoincrement())
+  username             String            @unique
+  password             String
+  rights               Int               @default(76)
+  item_box             Bytes?
+  last_character       Int?              @default(0)
+  last_login           DateTime?         @db.Timestamptz(6)
+  return_expires       DateTime?         @db.Timestamptz(6)
+  gacha_premium        Int?
+  gacha_trial          Int?
+  frontier_points      Int?
+  psn_id               String?
+  wiiu_key             String?
+  web_login_key        String?
+  web_login_key_mobile String?
+  characters           characters[]
+  discord_register     discord_register?
 }
 
 model warehouse {
-  character_id                                  Int        @id
-  item0                                         Bytes?
-  item1                                         Bytes?
-  item2                                         Bytes?
-  item3                                         Bytes?
-  item4                                         Bytes?
-  item5                                         Bytes?
-  item6                                         Bytes?
-  item7                                         Bytes?
-  item8                                         Bytes?
-  item9                                         Bytes?
-  item10                                        Bytes?
-  item0name                                     String?
-  item1name                                     String?
-  item2name                                     String?
-  item3name                                     String?
-  item4name                                     String?
-  item5name                                     String?
-  item6name                                     String?
-  item7name                                     String?
-  item8name                                     String?
-  item9name                                     String?
-  equip0                                        Bytes?
-  equip1                                        Bytes?
-  equip2                                        Bytes?
-  equip3                                        Bytes?
-  equip4                                        Bytes?
-  equip5                                        Bytes?
-  equip6                                        Bytes?
-  equip7                                        Bytes?
-  equip8                                        Bytes?
-  equip9                                        Bytes?
-  equip10                                       Bytes?
-  equip0name                                    String?
-  equip1name                                    String?
-  equip2name                                    String?
-  equip3name                                    String?
-  equip4name                                    String?
-  equip5name                                    String?
-  equip6name                                    String?
-  equip7name                                    String?
-  equip8name                                    String?
-  equip9name                                    String?
-  characters_warehouse_character_idTocharacters characters @relation("warehouse_character_idTocharacters", fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  @@index([character_id])
+  character_id Int        @id
+  item0        Bytes?
+  item1        Bytes?
+  item2        Bytes?
+  item3        Bytes?
+  item4        Bytes?
+  item5        Bytes?
+  item6        Bytes?
+  item7        Bytes?
+  item8        Bytes?
+  item9        Bytes?
+  item10       Bytes?
+  item0name    String?
+  item1name    String?
+  item2name    String?
+  item3name    String?
+  item4name    String?
+  item5name    String?
+  item6name    String?
+  item7name    String?
+  item8name    String?
+  item9name    String?
+  equip0       Bytes?
+  equip1       Bytes?
+  equip2       Bytes?
+  equip3       Bytes?
+  equip4       Bytes?
+  equip5       Bytes?
+  equip6       Bytes?
+  equip7       Bytes?
+  equip8       Bytes?
+  equip9       Bytes?
+  equip10      Bytes?
+  equip0name   String?
+  equip1name   String?
+  equip2name   String?
+  equip3name   String?
+  equip4name   String?
+  equip5name   String?
+  equip6name   String?
+  equip7name   String?
+  equip8name   String?
+  equip9name   String?
+  characters   characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum event_type {

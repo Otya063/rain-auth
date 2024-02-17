@@ -54,16 +54,30 @@ const login: Action = async ({ request, cookies, locals: { LL } }) => {
     }
 
     try {
-        const authUser = await db.users.update({
-            where: {
-                username: String(username),
-            },
-            data: {
-                web_login_key: getRandomString(32),
-            },
-        });
+        const regex = /iphone;|(android|nokia|blackberry|bb10;).+mobile|android.+fennec|opera.+mobi|windows phone|symbianos/i;
+        const isMobile = regex.test(request.headers.get('user-agent')!);
 
-        const userLoginKey: string = authUser.web_login_key!;
+        const authUser = !isMobile
+            ? // pc
+              await db.users.update({
+                  where: {
+                      username: String(username),
+                  },
+                  data: {
+                      web_login_key: getRandomString(32),
+                  },
+              })
+            : // mobile
+              await db.users.update({
+                  where: {
+                      username: String(username),
+                  },
+                  data: {
+                      web_login_key_mobile: getRandomString(32),
+                  },
+              });
+
+        const userLoginKey = !isMobile ? authUser.web_login_key! : authUser.web_login_key_mobile!;
 
         cookies.set('rainLoginKey', userLoginKey, {
             domain: COOKIES_DOMAIN,
@@ -76,11 +90,11 @@ const login: Action = async ({ request, cookies, locals: { LL } }) => {
         return { redirect: true };
     } catch (err) {
         if (err instanceof Error) {
-            throw error(400, { message: '', message1: LL.error['login'].failedLoginMsg1(), message2: [err.message], message3: '' });
+            throw error(400, { message: '', message1: LL.error['login'].failedLoginMsg1(), message2: [err.message], message3: undefined });
         } else if (typeof err === 'string') {
-            throw error(400, { message: '', message1: LL.error['login'].failedLoginMsg1(), message2: [err], message3: '' });
+            throw error(400, { message: '', message1: LL.error['login'].failedLoginMsg1(), message2: [err], message3: undefined });
         } else {
-            throw error(400, { message: '', message1: LL.error['login'].failedLoginMsg1(), message2: [''], message3: '' });
+            throw error(400, { message: '', message1: LL.error['login'].failedLoginMsg1(), message2: undefined, message3: undefined});
         }
     }
 };

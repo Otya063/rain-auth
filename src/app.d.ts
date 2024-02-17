@@ -4,9 +4,9 @@ import type { Token } from '$lib/types';
 declare global {
     namespace App {
         interface Error {
-            message1: string;
-            message2: string[];
-            message3: string;
+            message1?: string;
+            message2?: string[];
+            message3?: string;
         }
         interface Locals {
             locale: Locales;

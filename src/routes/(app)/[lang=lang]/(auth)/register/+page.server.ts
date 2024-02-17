@@ -2,7 +2,7 @@ import type { Action, Actions } from './$types';
 import type { users } from '@prisma/client/edge';
 import { fail } from '@sveltejs/kit';
 import { COOKIES_DOMAIN, TURNSTILE_SECRET_KEY } from '$env/static/private';
-import ServerData, { db } from '$lib/database';
+import ServerData from '$lib/database';
 import { convFormDataToObj, validateToken } from '$lib/utils';
 import bcrypt from 'bcryptjs';
 
