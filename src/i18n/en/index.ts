@@ -30,7 +30,7 @@ const en: BaseTranslation = {
         stage1Text: ['Username <span>(6-20 charcters, may only contain alphanumeric characters)</span>', 'Password <span>(10-32 charcters)</span>', 'Confirm Password', 'Password Strength'],
         stage1Btn: 'Register',
         stage2Text:
-            '</p>Registration has not been completed yet.<br>Click "Redirect" button below to move to the discord authorization page and complete the discord account linking.</p><p style="color: #ff1e1e;">* To link your account, you must be a member of the official Rain Server discord. You can join <a style="text-decoration: underline;" href="https://discord.gg/TcpkpUpeGw" target="_blank" rel="noopener noreferrer">here</a>.',
+            '</p>Registration has not been completed yet.<br>Click "Redirect" button below to move to the discord authorization page and complete the discord account linkage.</p><p style="color: #ff1e1e;">* To link your account, you must be a member of the official Rain Server discord. You can join <a style="text-decoration: underline;" href="https://discord.gg/TcpkpUpeGw" target="_blank" rel="noopener noreferrer">here</a>.',
         stage2Btn: 'Redirect',
         stage1_1Text:
             '<p>A verification code has been sent to your direct message.<br>Please confirm that you have received the code and proceed to the input page.</p><p style="color: #ff1e1e;">This procedure should be completed within {min: number} minutes of this.</p>',
@@ -43,7 +43,7 @@ const en: BaseTranslation = {
             'contain at least one symbol ({symbol: string}).',
         ],
         haveAccount: 'Already have an account?',
-        doneRegister: 'Account creation and discord linking has been successfully completed.<br>Feel free to close this browser window.',
+        doneRegister: 'Account creation and discord account linkage has been successfully completed.<br>Feel free to close this browser window.',
         userExist: 'The user already exists.',
         invUsername: 'Enter your username correctly.',
         invUsernameChar: 'Your username may only contain alphanumeric characters. (6-20 charcters, A-Z, a-z, 0-9)',
@@ -70,7 +70,7 @@ const en: BaseTranslation = {
     // Reset Password Page
     resetPassword: {
         metaTitle: 'Forgot Password',
-        metaDesc: 'This is the account linking page for the Rain Server version of Monster Hunter Frontier Online. If you have lost your password, you can reset a new one from this page.',
+        metaDesc: 'This is the password reset page for the Rain Server version of Monster Hunter Frontier Online. If you have lost your password, you can reset a new one from this page.',
         title: 'Reset Password',
         stage1Btn: 'Confirm',
         stage2Text: 'Verification Code Input Field',
@@ -85,9 +85,9 @@ const en: BaseTranslation = {
 
     // Link Discord Page
     linkDiscord: {
-        metaTitle: 'Discord Account Linking',
-        metaDesc: 'This is the account linking page for the Rain Server version of Monster Hunter Frontier Online. You can link your discord account to your game account.',
-        title: 'Account Linking',
+        metaTitle: 'Discord Account Linkage',
+        metaDesc: 'This is the account linkage page for the Rain Server version of Monster Hunter Frontier Online. You can link your discord account to your game account.',
+        title: 'Account Linkage',
         stage3Btn: 'Next',
         discordUserIDLabel: 'User ID (Discord)',
         discordUsernameLabel: 'Username (Discord)',
