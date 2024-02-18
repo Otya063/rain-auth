@@ -131,7 +131,7 @@ model characters {
   stampcard                                                      Int                  @default(0)
   mezfes                                                         Bytes?
   cafe_time                                                      Int?                 @default(0)
-  users                                                          users?               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  users                                                          users?               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   discord                                                        discord?
   distribution                                                   distribution[]
   guild_applications_guild_applications_actor_idTocharacters     guild_applications[] @relation("guild_applications_actor_idTocharacters")
@@ -165,7 +165,7 @@ model discord {
   gold               Int?       @default(0)
   silver             Int?       @default(0)
   bronze             Int?       @default(0)
-  characters         characters @relation(fields: [char_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characters         characters @relation(fields: [char_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "characters_fk")
 }
 
 model discord_register {
@@ -173,7 +173,7 @@ model discord_register {
   discord_id String?   @unique @db.VarChar(32)
   user_id    Int       @unique
   created_at DateTime? @default(now()) @db.Timestamp(6)
-  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "users_fk")
 }
 
 model distribution {
@@ -192,7 +192,7 @@ model distribution {
   max_gr           Int         @default(65535)
   data             Bytes
   bot              Boolean     @default(false)
-  characters       characters? @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characters       characters? @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model distributions_accepted {
@@ -356,9 +356,9 @@ model guild_applications {
   actor_id                                               Int
   application_type                                       guild_application_type
   created_at                                             DateTime               @default(now()) @db.Timestamptz(6)
-  characters_guild_applications_actor_idTocharacters     characters             @relation("guild_applications_actor_idTocharacters", fields: [actor_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  characters_guild_applications_character_idTocharacters characters             @relation("guild_applications_character_idTocharacters", fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  guilds                                                 guilds                 @relation(fields: [guild_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characters_guild_applications_actor_idTocharacters     characters             @relation("guild_applications_actor_idTocharacters", fields: [actor_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  characters_guild_applications_character_idTocharacters characters             @relation("guild_applications_character_idTocharacters", fields: [character_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  guilds                                                 guilds                 @relation(fields: [guild_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([guild_id, character_id], map: "guild_application_character_id")
   @@index([application_type], map: "guild_application_type_index")
@@ -380,8 +380,8 @@ model guild_characters {
   tower_mission_3  Int?
   box_claimed      DateTime?   @default(now()) @db.Timestamptz(6)
   treasure_hunt    Int?
-  characters       characters? @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  guilds           guilds?     @relation(fields: [guild_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characters       characters? @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  guilds           guilds?     @relation(fields: [guild_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model guild_hunts {
@@ -514,7 +514,7 @@ model mail {
   deleted                Boolean    @default(false)
   locked                 Boolean    @default(false)
   is_sys_message         Boolean?   @default(false)
-  characters             characters @relation(fields: [recipient_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characters             characters @relation(fields: [recipient_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([recipient_id, deleted, created_at(sort: Desc), id(sort: Desc)], map: "mail_recipient_deleted_created_id_index")
 }
@@ -618,7 +618,7 @@ model rengoku_score {
   max_points_mp Int?
   max_stages_sp Int?
   max_points_sp Int?
-  characters    characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characters    characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model scenario_counter {
@@ -658,7 +658,7 @@ model shop_items_bought {
   character_id Int
   shop_item_id Int
   bought       Int
-  characters   characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "shop_item_state_char_id_fkey")
+  characters   characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "shop_item_state_char_id_fkey")
 
   @@id([character_id, shop_item_id, bought], map: "shop_item_state_pkey")
   @@unique([character_id, shop_item_id], map: "shop_item_state_id_itemhash")
@@ -815,7 +815,7 @@ model warehouse {
   equip7name   String?
   equip8name   String?
   equip9name   String?
-  characters   characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  characters   characters @relation(fields: [character_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum event_type {
