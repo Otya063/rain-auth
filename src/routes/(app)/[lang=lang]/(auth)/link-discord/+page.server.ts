@@ -41,31 +41,34 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
     }
 
     tokenData = null;
-    let resStatus: number;
-    let resStatusText: string;
-    try {
-        const res = await fetch(`https://api.rain-server.com/link-discord`, {
-            method: 'POST',
-            body: JSON.stringify({ discord_access_token: discordAccessToken, discord_id: discordId, discord_username: discordUsername, discord_avatar: discordAvatar }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Origin': url.origin,
-            },
-        });
-        const resJson: RainApiPostResponseData = await res.json();
-        resStatus = res.status;
-        resStatusText = res.statusText;
-        userKey = resJson.user_key;
-        ttl = resJson.expire_ttl;
-    } catch (err) {
-        if (err instanceof Error) {
-            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-        } else if (typeof err === 'string') {
-            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-        } else {
-            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+
+    const { resStatus, resStatusText } = await (async () => {
+        try {
+            const res = await fetch(`https://api.rain-server.com/link-discord`, {
+                method: 'POST',
+                body: JSON.stringify({ discord_access_token: discordAccessToken, discord_id: discordId, discord_username: discordUsername, discord_avatar: discordAvatar }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Origin': url.origin,
+                },
+            });
+            const resJson: RainApiPostResponseData = await res.json();
+            const resStatus = res.status;
+            const resStatusText = res.statusText;
+            userKey = resJson.user_key;
+            ttl = resJson.expire_ttl;
+
+            return { resStatus, resStatusText };
+        } catch (err) {
+            if (err instanceof Error) {
+                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
+            } else if (typeof err === 'string') {
+                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
+            } else {
+                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+            }
         }
-    }
+    })();
 
     if (resStatus !== 201) {
         throw error(resStatus as NumericRange<400, 599>, {
@@ -156,28 +159,31 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
                 throw error(401, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
             }
 
-            let resStatus: number;
-            let resStatusText: string;
-            try {
-                const res = await fetch(`https://api.rain-server.com/link-discord/${userKey}`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ rest_expire_ttl: restSecondsTime, user_id: user.id }),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Origin': url.origin,
-                    },
-                });
-                resStatus = res.status;
-                resStatusText = res.statusText;
-            } catch (err) {
-                if (err instanceof Error) {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-                } else if (typeof err === 'string') {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-                } else {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+            const { resStatus, resStatusText } = await (async () => {
+                try {
+                    const res = await fetch(`https://api.rain-server.com/link-discord/${userKey}`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({ rest_expire_ttl: restSecondsTime, user_id: user.id }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Origin': url.origin,
+                        },
+                    });
+
+                    const resStatus = res.status;
+                    const resStatusText = res.statusText;
+
+                    return { resStatus, resStatusText };
+                } catch (err) {
+                    if (err instanceof Error) {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
+                    } else if (typeof err === 'string') {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
+                    } else {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+                    }
                 }
-            }
+            })();
 
             if (resStatus !== 204) {
                 throw error(resStatus as NumericRange<400, 599>, {
@@ -215,29 +221,31 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
             const charName: string = charData[1];
             const charInfo: string = charData[2];
 
-            let fetchData: LinkDiscordGetData;
-            let resStatus: number;
-            let resStatusText: string;
-            try {
-                const res = await fetch(`https://api.rain-server.com/link-discord/${userKey}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Origin': url.origin,
-                    },
-                });
-                fetchData = await res.json();
-                resStatus = res.status;
-                resStatusText = res.statusText;
-            } catch (err) {
-                if (err instanceof Error) {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-                } else if (typeof err === 'string') {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-                } else {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+            const { fetchData, resStatus, resStatusText } = await (async () => {
+                try {
+                    const res = await fetch(`https://api.rain-server.com/link-discord/${userKey}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Origin': url.origin,
+                        },
+                    });
+
+                    const fetchData = (await res.json()) as LinkDiscordGetData;
+                    const resStatus = res.status;
+                    const resStatusText = res.statusText;
+
+                    return { fetchData, resStatus, resStatusText };
+                } catch (err) {
+                    if (err instanceof Error) {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
+                    } else if (typeof err === 'string') {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
+                    } else {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+                    }
                 }
-            }
+            })();
 
             if (resStatus !== 200) {
                 throw error(resStatus as NumericRange<400, 599>, {
@@ -262,7 +270,7 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
             }
 
             // prod: 1017643913667936318
-            if (!guildMemberData!.roles.includes('1181583278956892222')) {
+            if (!guildMemberData.roles.includes('1181583278956892222')) {
                 //const registeredRoleStatus: number = await addRoleToUser('937230168223789066', fetchData.discord_id, '1017643913667936318'); prod
                 const registeredRoleStatus: number = await addRoleToUser('1177982376945668146', fetchData.discord_id, '1181583278956892222');
                 if (registeredRoleStatus !== 204) {

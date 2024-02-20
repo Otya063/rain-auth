@@ -566,11 +566,16 @@
         &.link_discord_done_stage4 {
             padding: 100px 0 90px;
         }
-
+        
         // ディスコードアカウント連携ページ（ステージ５）
         &.link_discord_done_stage5 {
             width: 30%;
             padding: 90px 0 40px;
+        }
+
+        // キャラクター切り替えページ（ステージ４）
+        &.switch_character_done_stage4 {
+            padding: 100px 0 60px;
         }
     }
 

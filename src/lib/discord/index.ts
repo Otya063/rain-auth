@@ -71,6 +71,12 @@ export const sendDirectMessages = async (userId: string, verificationCode: strin
             break;
         }
 
+        case 'switch-character': {
+            contentMsg = LL.resetPassword['verifCodeDesc']({ site: LL.switchCharacter['metaTitle'](), time });
+
+            break;
+        }
+
         default: {
             contentMsg = 'Invalid Input';
         }
