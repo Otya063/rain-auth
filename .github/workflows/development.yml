@@ -15,8 +15,8 @@ jobs:
     build-for-development:
         runs-on: ubuntu-latest
         env:
-            DATABASE_URL: ${{ secrets.DATABASE_URL }}
-            DIRECT_URL: ${{ secrets.DIRECT_URL }}
+            DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+            DIRECT_URL: ${{ secrets.DEV_DIRECT_URL }}
             ADMIN_CREDENTIALS: ${{ secrets.ADMIN_CREDENTIALS }}
             COOKIES_DOMAIN: ${{ secrets.COOKIES_DOMAIN }}
             PUBLIC_MAIN_DOMAIN: ${{ secrets.DEV_MAIN_DOMAIN }}
