@@ -100,6 +100,15 @@ const ja: Translation = {
         userLinked: 'このユーザーアカウントは、既に他のディスコードアカウントと連携されています。',
     },
 
+    // Switch Character
+    switchCharacter: {
+        metaTitle: '連携済みキャラクター変更',
+        metaDesc: 'レインサーバー版「モンスターハンター フロンティア オンライン」の連携キャラクター変更ページです。連携済みのキャラクターを別のキャラクターに変更することができます。',
+        title: 'キャラクター切り替え',
+        currentLinkedLabel: '現在連携されているキャラクター',
+        doneSwitchChar: '連携キャラクターの変更が正常に完了しました。<br>このページは閉じても構いません。',
+    },
+
     // Maintenance Page
     maintenance: {
         title: 'メンテナンス中',
@@ -177,7 +186,7 @@ const ja: Translation = {
 
         resetPassword: {
             failedResetMsg1: '次のような理由により、パスワードの再設定に失敗しました。',
-            noLinkedUser: '認証時にログインしたディスコードと連携しているゲームアカウントが見つからない。',
+            noLinkedUser: '認証時にログインしたディスコードアカウントと連携しているゲームアカウントが存在しない。',
             failedSendDM: '認証ユーザーへのダイレクトメッセージ送信に失敗。',
             failedSendDMMsg3:
                 'ディスコード内設定「サーバーにいるメンバーからのダイレクトメッセージを許可する」を無効にしているか、<br>レインサーバー公式ディスコードへ参加していない可能性があります。',

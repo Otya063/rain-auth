@@ -42,30 +42,33 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
     tokenData = null;
     const userId = resetPassUserData.id;
     const username = resetPassUserData.username;
-    let resStatus: number;
-    let resStatusText: string;
-    try {
-        const res = await fetch(`https://api.rain-server.com/reset-password`, {
-            method: 'POST',
-            body: JSON.stringify({ discord_access_token: discordAccessToken, discord_id: discordId, user_id: userId, username }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Origin': url.origin,
-            },
-        });
-        const resJson: RainApiPostResponseData = await res.json();
-        resStatus = res.status;
-        resStatusText = res.statusText;
-        userKey = resJson.user_key;
-    } catch (err) {
-        if (err instanceof Error) {
-            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-        } else if (typeof err === 'string') {
-            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-        } else {
-            throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+
+    const { resStatus, resStatusText } = await (async () => {
+        try {
+            const res = await fetch(`https://api.rain-server.com/reset-password`, {
+                method: 'POST',
+                body: JSON.stringify({ discord_access_token: discordAccessToken, discord_id: discordId, user_id: userId, username }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Origin': url.origin,
+                },
+            });
+            const resJson: RainApiPostResponseData = await res.json();
+            const resStatus = res.status;
+            const resStatusText = res.statusText;
+            userKey = resJson.user_key;
+
+            return { resStatus, resStatusText };
+        } catch (err) {
+            if (err instanceof Error) {
+                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
+            } else if (typeof err === 'string') {
+                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
+            } else {
+                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+            }
         }
-    }
+    })();
 
     if (resStatus !== 201) {
         throw error(resStatus as NumericRange<400, 599>, {
@@ -137,29 +140,31 @@ const resetPassword: Action = async ({ url, request, locals: { LL } }) => {
                 return fail(400, { error: true, invalidPasswordStrength: true, errorPassword: true });
             }
 
-            let fetchData: ResetPasswordGetData;
-            let resStatus: number;
-            let resStatusText: string;
-            try {
-                const res = await fetch(`https://api.rain-server.com/reset-password/${userKey}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Origin': url.origin,
-                    },
-                });
-                fetchData = await res.json();
-                resStatus = res.status;
-                resStatusText = res.statusText;
-            } catch (err) {
-                if (err instanceof Error) {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-                } else if (typeof err === 'string') {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-                } else {
-                    throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+            const { fetchData, resStatus, resStatusText } = await (async () => {
+                try {
+                    const res = await fetch(`https://api.rain-server.com/reset-password/${userKey}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Origin': url.origin,
+                        },
+                    });
+
+                    const fetchData = (await res.json()) as ResetPasswordGetData;
+                    const resStatus = res.status;
+                    const resStatusText = res.statusText;
+
+                    return { fetchData, resStatus, resStatusText };
+                } catch (err) {
+                    if (err instanceof Error) {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
+                    } else if (typeof err === 'string') {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
+                    } else {
+                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
+                    }
                 }
-            }
+            })();
 
             if (resStatus !== 200) {
                 throw error(resStatus as NumericRange<400, 599>, {

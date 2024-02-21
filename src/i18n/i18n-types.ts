@@ -90,7 +90,7 @@ type RootTranslation = {
 		 */
 		stage1Btn: string
 		/**
-		 * <​/​p​>​R​e​g​i​s​t​r​a​t​i​o​n​ ​h​a​s​ ​n​o​t​ ​b​e​e​n​ ​c​o​m​p​l​e​t​e​d​ ​y​e​t​.​<​b​r​>​C​l​i​c​k​ ​"​R​e​d​i​r​e​c​t​"​ ​b​u​t​t​o​n​ ​b​e​l​o​w​ ​t​o​ ​m​o​v​e​ ​t​o​ ​t​h​e​ ​d​i​s​c​o​r​d​ ​a​u​t​h​o​r​i​z​a​t​i​o​n​ ​p​a​g​e​ ​a​n​d​ ​c​o​m​p​l​e​t​e​ ​t​h​e​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​l​i​n​k​i​n​g​.​<​/​p​>​<​p​ ​s​t​y​l​e​=​"​c​o​l​o​r​:​ ​#​f​f​1​e​1​e​;​"​>​*​ ​T​o​ ​l​i​n​k​ ​y​o​u​r​ ​a​c​c​o​u​n​t​,​ ​y​o​u​ ​m​u​s​t​ ​b​e​ ​a​ ​m​e​m​b​e​r​ ​o​f​ ​t​h​e​ ​o​f​f​i​c​i​a​l​ ​R​a​i​n​ ​S​e​r​v​e​r​ ​d​i​s​c​o​r​d​.​ ​Y​o​u​ ​c​a​n​ ​j​o​i​n​ ​<​a​ ​s​t​y​l​e​=​"​t​e​x​t​-​d​e​c​o​r​a​t​i​o​n​:​ ​u​n​d​e​r​l​i​n​e​;​"​ ​h​r​e​f​=​"​h​t​t​p​s​:​/​/​d​i​s​c​o​r​d​.​g​g​/​T​c​p​k​p​U​p​e​G​w​"​ ​t​a​r​g​e​t​=​"​_​b​l​a​n​k​"​ ​r​e​l​=​"​n​o​o​p​e​n​e​r​ ​n​o​r​e​f​e​r​r​e​r​"​>​h​e​r​e​<​/​a​>​.
+		 * <​/​p​>​R​e​g​i​s​t​r​a​t​i​o​n​ ​h​a​s​ ​n​o​t​ ​b​e​e​n​ ​c​o​m​p​l​e​t​e​d​ ​y​e​t​.​<​b​r​>​C​l​i​c​k​ ​"​R​e​d​i​r​e​c​t​"​ ​b​u​t​t​o​n​ ​b​e​l​o​w​ ​t​o​ ​m​o​v​e​ ​t​o​ ​t​h​e​ ​d​i​s​c​o​r​d​ ​a​u​t​h​o​r​i​z​a​t​i​o​n​ ​p​a​g​e​ ​a​n​d​ ​c​o​m​p​l​e​t​e​ ​t​h​e​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​l​i​n​k​a​g​e​.​<​/​p​>​<​p​ ​s​t​y​l​e​=​"​c​o​l​o​r​:​ ​#​f​f​1​e​1​e​;​"​>​*​ ​T​o​ ​l​i​n​k​ ​y​o​u​r​ ​a​c​c​o​u​n​t​,​ ​y​o​u​ ​m​u​s​t​ ​b​e​ ​a​ ​m​e​m​b​e​r​ ​o​f​ ​t​h​e​ ​o​f​f​i​c​i​a​l​ ​R​a​i​n​ ​S​e​r​v​e​r​ ​d​i​s​c​o​r​d​.​ ​Y​o​u​ ​c​a​n​ ​j​o​i​n​ ​<​a​ ​s​t​y​l​e​=​"​t​e​x​t​-​d​e​c​o​r​a​t​i​o​n​:​ ​u​n​d​e​r​l​i​n​e​;​"​ ​h​r​e​f​=​"​h​t​t​p​s​:​/​/​d​i​s​c​o​r​d​.​g​g​/​T​c​p​k​p​U​p​e​G​w​"​ ​t​a​r​g​e​t​=​"​_​b​l​a​n​k​"​ ​r​e​l​=​"​n​o​o​p​e​n​e​r​ ​n​o​r​e​f​e​r​r​e​r​"​>​h​e​r​e​<​/​a​>​.
 		 */
 		stage2Text: string
 		/**
@@ -148,7 +148,7 @@ type RootTranslation = {
 		 */
 		haveAccount: string
 		/**
-		 * A​c​c​o​u​n​t​ ​c​r​e​a​t​i​o​n​ ​a​n​d​ ​d​i​s​c​o​r​d​ ​l​i​n​k​i​n​g​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​c​o​m​p​l​e​t​e​d​.​<​b​r​>​F​e​e​l​ ​f​r​e​e​ ​t​o​ ​c​l​o​s​e​ ​t​h​i​s​ ​b​r​o​w​s​e​r​ ​w​i​n​d​o​w​.
+		 * A​c​c​o​u​n​t​ ​c​r​e​a​t​i​o​n​ ​a​n​d​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​l​i​n​k​a​g​e​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​c​o​m​p​l​e​t​e​d​.​<​b​r​>​F​e​e​l​ ​f​r​e​e​ ​t​o​ ​c​l​o​s​e​ ​t​h​i​s​ ​b​r​o​w​s​e​r​ ​w​i​n​d​o​w​.
 		 */
 		doneRegister: string
 		/**
@@ -228,7 +228,7 @@ type RootTranslation = {
 		 */
 		metaTitle: string
 		/**
-		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​a​c​c​o​u​n​t​ ​l​i​n​k​i​n​g​ ​p​a​g​e​ ​f​o​r​ ​t​h​e​ ​R​a​i​n​ ​S​e​r​v​e​r​ ​v​e​r​s​i​o​n​ ​o​f​ ​M​o​n​s​t​e​r​ ​H​u​n​t​e​r​ ​F​r​o​n​t​i​e​r​ ​O​n​l​i​n​e​.​ ​I​f​ ​y​o​u​ ​h​a​v​e​ ​l​o​s​t​ ​y​o​u​r​ ​p​a​s​s​w​o​r​d​,​ ​y​o​u​ ​c​a​n​ ​r​e​s​e​t​ ​a​ ​n​e​w​ ​o​n​e​ ​f​r​o​m​ ​t​h​i​s​ ​p​a​g​e​.
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​p​a​s​s​w​o​r​d​ ​r​e​s​e​t​ ​p​a​g​e​ ​f​o​r​ ​t​h​e​ ​R​a​i​n​ ​S​e​r​v​e​r​ ​v​e​r​s​i​o​n​ ​o​f​ ​M​o​n​s​t​e​r​ ​H​u​n​t​e​r​ ​F​r​o​n​t​i​e​r​ ​O​n​l​i​n​e​.​ ​I​f​ ​y​o​u​ ​h​a​v​e​ ​l​o​s​t​ ​y​o​u​r​ ​p​a​s​s​w​o​r​d​,​ ​y​o​u​ ​c​a​n​ ​r​e​s​e​t​ ​a​ ​n​e​w​ ​o​n​e​ ​f​r​o​m​ ​t​h​i​s​ ​p​a​g​e​.
 		 */
 		metaDesc: string
 		/**
@@ -283,15 +283,15 @@ type RootTranslation = {
 	}
 	linkDiscord: {
 		/**
-		 * D​i​s​c​o​r​d​ ​A​c​c​o​u​n​t​ ​L​i​n​k​i​n​g
+		 * D​i​s​c​o​r​d​ ​A​c​c​o​u​n​t​ ​L​i​n​k​a​g​e
 		 */
 		metaTitle: string
 		/**
-		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​a​c​c​o​u​n​t​ ​l​i​n​k​i​n​g​ ​p​a​g​e​ ​f​o​r​ ​t​h​e​ ​R​a​i​n​ ​S​e​r​v​e​r​ ​v​e​r​s​i​o​n​ ​o​f​ ​M​o​n​s​t​e​r​ ​H​u​n​t​e​r​ ​F​r​o​n​t​i​e​r​ ​O​n​l​i​n​e​.​ ​Y​o​u​ ​c​a​n​ ​l​i​n​k​ ​y​o​u​r​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​t​o​ ​y​o​u​r​ ​g​a​m​e​ ​a​c​c​o​u​n​t​.
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​a​c​c​o​u​n​t​ ​l​i​n​k​a​g​e​ ​p​a​g​e​ ​f​o​r​ ​t​h​e​ ​R​a​i​n​ ​S​e​r​v​e​r​ ​v​e​r​s​i​o​n​ ​o​f​ ​M​o​n​s​t​e​r​ ​H​u​n​t​e​r​ ​F​r​o​n​t​i​e​r​ ​O​n​l​i​n​e​.​ ​Y​o​u​ ​c​a​n​ ​l​i​n​k​ ​y​o​u​r​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​t​o​ ​y​o​u​r​ ​g​a​m​e​ ​a​c​c​o​u​n​t​.
 		 */
 		metaDesc: string
 		/**
-		 * A​c​c​o​u​n​t​ ​L​i​n​k​i​n​g
+		 * A​c​c​o​u​n​t​ ​L​i​n​k​a​g​e
 		 */
 		title: string
 		/**
@@ -348,6 +348,28 @@ type RootTranslation = {
 		 * T​h​i​s​ ​u​s​e​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​a​l​r​e​a​d​y​ ​l​i​n​k​e​d​ ​t​o​ ​a​n​o​t​h​e​r​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​.
 		 */
 		userLinked: string
+	}
+	switchCharacter: {
+		/**
+		 * C​h​a​n​g​e​ ​L​i​n​k​e​d​ ​C​h​a​r​a​c​t​e​r
+		 */
+		metaTitle: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​c​h​a​n​g​e​ ​o​f​ ​t​h​e​ ​l​i​n​k​e​d​ ​c​h​a​r​a​c​t​e​r​ ​c​h​a​n​g​e​ ​p​a​g​e​ ​f​o​r​ ​t​h​e​ ​R​a​i​n​ ​S​e​r​v​e​r​ ​v​e​r​s​i​o​n​ ​o​f​ ​M​o​n​s​t​e​r​ ​H​u​n​t​e​r​ ​F​r​o​n​t​i​e​r​ ​O​n​l​i​n​e​.​ ​Y​o​u​ ​c​a​n​ ​c​h​a​n​g​e​ ​t​h​e​ ​l​i​n​k​e​d​ ​c​h​a​r​a​c​t​e​r​ ​t​o​ ​a​n​o​t​h​e​r​ ​c​h​a​r​a​c​t​e​r​.
+		 */
+		metaDesc: string
+		/**
+		 * C​h​a​r​a​c​t​e​r​ ​S​w​i​t​c​h​i​n​g
+		 */
+		title: string
+		/**
+		 * C​h​a​r​a​c​t​e​r​ ​C​u​r​r​e​n​t​l​y​ ​L​i​n​k​e​d
+		 */
+		currentLinkedLabel: string
+		/**
+		 * T​h​e​ ​c​h​a​n​g​e​ ​o​f​ ​t​h​e​ ​l​i​n​k​e​d​ ​c​h​a​r​a​c​t​e​r​ ​h​a​s​ ​b​e​e​n​ ​s​u​c​c​e​s​s​f​u​l​l​y​ ​p​e​r​f​o​r​m​e​d​.​<​b​r​>​F​e​e​l​ ​f​r​e​e​ ​t​o​ ​c​l​o​s​e​ ​t​h​i​s​ ​b​r​o​w​s​e​r​ ​w​i​n​d​o​w​.
+		 */
+		doneSwitchChar: string
 	}
 	maintenance: {
 		/**
@@ -552,7 +574,7 @@ type RootTranslation = {
 			 */
 			failedResetMsg1: string
 			/**
-			 * T​h​e​ ​g​a​m​e​ ​a​c​c​o​u​n​t​ ​l​i​n​k​e​d​ ​t​o​ ​y​o​u​r​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​y​o​u​ ​l​o​g​g​e​d​ ​i​n​ ​t​o​ ​d​u​r​i​n​g​ ​a​u​t​h​o​r​i​z​a​t​i​o​n​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​f​o​u​n​d​.
+			 * T​h​e​ ​g​a​m​e​ ​a​c​c​o​u​n​t​ ​l​i​n​k​e​d​ ​t​o​ ​y​o​u​r​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​l​o​g​g​e​d​ ​i​n​ ​a​t​ ​t​h​e​ ​t​i​m​e​ ​o​f​ ​a​u​t​h​o​r​i​z​a​t​i​o​n​ ​d​o​e​s​ ​n​o​t​ ​e​x​i​s​t​.
 			 */
 			noLinkedUser: string
 			/**
@@ -675,7 +697,7 @@ export type TranslationFunctions = {
 		 */
 		stage1Btn: () => LocalizedString
 		/**
-		 * </p>Registration has not been completed yet.<br>Click "Redirect" button below to move to the discord authorization page and complete the discord account linking.</p><p style="color: #ff1e1e;">* To link your account, you must be a member of the official Rain Server discord. You can join <a style="text-decoration: underline;" href="https://discord.gg/TcpkpUpeGw" target="_blank" rel="noopener noreferrer">here</a>.
+		 * </p>Registration has not been completed yet.<br>Click "Redirect" button below to move to the discord authorization page and complete the discord account linkage.</p><p style="color: #ff1e1e;">* To link your account, you must be a member of the official Rain Server discord. You can join <a style="text-decoration: underline;" href="https://discord.gg/TcpkpUpeGw" target="_blank" rel="noopener noreferrer">here</a>.
 		 */
 		stage2Text: () => LocalizedString
 		/**
@@ -731,7 +753,7 @@ export type TranslationFunctions = {
 		 */
 		haveAccount: () => LocalizedString
 		/**
-		 * Account creation and discord linking has been successfully completed.<br>Feel free to close this browser window.
+		 * Account creation and discord account linkage has been successfully completed.<br>Feel free to close this browser window.
 		 */
 		doneRegister: () => LocalizedString
 		/**
@@ -811,7 +833,7 @@ export type TranslationFunctions = {
 		 */
 		metaTitle: () => LocalizedString
 		/**
-		 * This is the account linking page for the Rain Server version of Monster Hunter Frontier Online. If you have lost your password, you can reset a new one from this page.
+		 * This is the password reset page for the Rain Server version of Monster Hunter Frontier Online. If you have lost your password, you can reset a new one from this page.
 		 */
 		metaDesc: () => LocalizedString
 		/**
@@ -864,15 +886,15 @@ export type TranslationFunctions = {
 	}
 	linkDiscord: {
 		/**
-		 * Discord Account Linking
+		 * Discord Account Linkage
 		 */
 		metaTitle: () => LocalizedString
 		/**
-		 * This is the account linking page for the Rain Server version of Monster Hunter Frontier Online. You can link your discord account to your game account.
+		 * This is the account linkage page for the Rain Server version of Monster Hunter Frontier Online. You can link your discord account to your game account.
 		 */
 		metaDesc: () => LocalizedString
 		/**
-		 * Account Linking
+		 * Account Linkage
 		 */
 		title: () => LocalizedString
 		/**
@@ -929,6 +951,28 @@ export type TranslationFunctions = {
 		 * This user account is already linked to another discord account.
 		 */
 		userLinked: () => LocalizedString
+	}
+	switchCharacter: {
+		/**
+		 * Change Linked Character
+		 */
+		metaTitle: () => LocalizedString
+		/**
+		 * This is the change of the linked character change page for the Rain Server version of Monster Hunter Frontier Online. You can change the linked character to another character.
+		 */
+		metaDesc: () => LocalizedString
+		/**
+		 * Character Switching
+		 */
+		title: () => LocalizedString
+		/**
+		 * Character Currently Linked
+		 */
+		currentLinkedLabel: () => LocalizedString
+		/**
+		 * The change of the linked character has been successfully performed.<br>Feel free to close this browser window.
+		 */
+		doneSwitchChar: () => LocalizedString
 	}
 	maintenance: {
 		/**
@@ -1133,7 +1177,7 @@ export type TranslationFunctions = {
 			 */
 			failedResetMsg1: () => LocalizedString
 			/**
-			 * The game account linked to your discord account you logged in to during authorization could not be found.
+			 * The game account linked to your discord account logged in at the time of authorization does not exist.
 			 */
 			noLinkedUser: () => LocalizedString
 			/**

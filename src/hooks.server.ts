@@ -64,7 +64,7 @@ export const handle: Handle = async ({ event, resolve }) => {
             status: 302,
             headers: { Location: redirectUrl },
         });
-    } else if (pathname === 'reset-password/' || pathname === 'link-discord/' || pathname === 'register/done/') {
+    } else if (pathname === 'reset-password/' || pathname === 'link-discord/' || pathname === 'register/done/' || pathname === 'switch-character/') {
         const code = event.url.searchParams.get('code')!;
         let type: string;
         pathname === 'register/done/' ? (type = 'register') : (type = pathname.replace('/', ''));

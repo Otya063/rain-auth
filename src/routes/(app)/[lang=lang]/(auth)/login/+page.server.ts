@@ -10,7 +10,7 @@ import bcrypt from 'bcryptjs';
 export const load: PageServerLoad = async ({ url }) => {
     const redirectURL: string | null = url.searchParams.get('redirect_url');
     const reqType: string | null = url.searchParams.get('type');
-    if (reqType === 'reset-password' || reqType === 'link-discord' || reqType === 'register') {
+    if (reqType === 'reset-password' || reqType === 'link-discord' || reqType === 'register' || reqType === 'switch-character') {
         throw redirect(
             303,
             `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${decodeURIComponent(

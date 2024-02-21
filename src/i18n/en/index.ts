@@ -101,6 +101,15 @@ const en: BaseTranslation = {
         userLinked: 'This user account is already linked to another discord account.',
     },
 
+    // Switch Character
+    switchCharacter: {
+        metaTitle: 'Change Linked Character',
+        metaDesc: 'This is the change of the linked character change page for the Rain Server version of Monster Hunter Frontier Online. You can change the linked character to another character.',
+        title: 'Character Switching',
+        currentLinkedLabel: 'Character Currently Linked',
+        doneSwitchChar: 'The change of the linked character has been successfully performed.<br>Feel free to close this browser window.',
+    },
+
     // Maintenance Page
     maintenance: {
         title: 'Under Maintenance',
@@ -178,7 +187,7 @@ const en: BaseTranslation = {
 
         resetPassword: {
             failedResetMsg1: 'Failed to reset the password for the following reason:',
-            noLinkedUser: 'The game account linked to your discord account you logged in to during authorization could not be found.',
+            noLinkedUser: 'The game account linked to your discord account logged in at the time of authorization does not exist.',
             failedSendDM: 'Failed to send direct message to authorised user.',
             failedSendDMMsg3:
                 'You may have disabled the setting "Allow direct messages from server members" within Privacy & Safety settings,<br>or you may not have joined the official Rain Server discord.',

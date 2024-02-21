@@ -34,7 +34,7 @@
             id="sel_btn"
             on:click={() => onClickLangSel()}
             class="header_language_selector"
-            class:disabled_elm={pathname.includes('register/done/') || pathname.includes('reset-password/') || pathname.includes('link-discord/')}
+            class:disabled_elm={pathname.includes('register/done/') || pathname.includes('reset-password/') || pathname.includes('link-discord/') || pathname.includes('switch-character/')}
         >
             <span class="global_mark material-icons">public</span>
             <span class="current_language">
