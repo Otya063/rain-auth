@@ -293,13 +293,9 @@
                     font-size: 1.5rem;
                     justify-content: space-between;
 
-                    // チェック状態のチェックボックスアイコン
-                    #remember_me:checked {
-                        + label[for='remember_me'] {
-                            &::before {
-                                content: '\e2e6';
-                            }
-                        }
+                    .material-icons-outlined {
+                        font-size: 2.1rem;
+                        padding: 0 5px 0px 0;
                     }
 
                     // 「ログイン情報を保存する」チェックボックス
@@ -308,14 +304,6 @@
                         align-items: center;
                         justify-content: space-between;
                         white-space: nowrap;
-
-                        // チェックボックスアイコン
-                        &::before {
-                            font-family: 'Material Icons';
-                            content: '\e836';
-                            font-size: 2.1rem;
-                            padding-right: 3%;
-                        }
                     }
 
                     // パスワードを忘れたら
@@ -323,11 +311,8 @@
                         display: flex;
                         align-items: center;
 
-                        // 矢印アイコン
-                        &::before {
-                            font-family: 'Material Icons';
-                            content: '\e5cc';
-                            font-size: 2.1rem;
+                        .material-icons-outlined {
+                            padding: 0;
                         }
                     }
                 }
@@ -460,9 +445,7 @@
                 padding: 5%;
                 font-size: 1.5rem;
 
-                &::before {
-                    font-family: 'Material Icons';
-                    content: '\e5cc';
+                .material-icons-outlined {
                     font-size: 2.1rem;
                 }
             }
@@ -566,7 +549,7 @@
         &.link_discord_done_stage4 {
             padding: 100px 0 90px;
         }
-        
+
         // ディスコードアカウント連携ページ（ステージ５）
         &.link_discord_done_stage5 {
             width: 30%;
