@@ -148,9 +148,10 @@
                 <PasswordStrength on:strengthChange={onStrengthChange} {password} />
             </div>
 
-            <button out:slide={{ duration: 700, axis: 'y' }} class="form_area_msg_only" on:click={(e) => loadArticle(e, $page.url, $locale, 'login/')} type="button"
-                >{$LL.register['haveAccount']()}</button
-            >
+            <button out:slide={{ duration: 700, axis: 'y' }} class="form_area_msg_only" on:click={(e) => loadArticle(e, $page.url, $locale, 'login/')} type="button">
+                <span class="material-icons-outlined">chevron_right</span>
+                {$LL.register['haveAccount']()}
+            </button>
         {:else if stage === 2}
             <div in:slide={{ duration: 800, delay: 800, axis: 'y' }} class="form_area_item textbox">
                 <p>{@html $LL.register['stage2Text']()}</p>

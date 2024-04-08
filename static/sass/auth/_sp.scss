@@ -313,13 +313,9 @@
                     align-items: center;
                     flex-direction: column;
 
-                    // チェック状態のチェックボックスアイコン
-                    #remember_me:checked {
-                        + label[for='remember_me'] {
-                            &::before {
-                                content: '\e2e6';
-                            }
-                        }
+                    .material-icons-outlined {
+                        font-size: 1.8rem;
+                        padding: 0 5px 0px 0;
                     }
 
                     // 「ログイン情報を保存する」チェックボックス
@@ -329,14 +325,7 @@
                         align-items: center;
                         width: 100%;
                         justify-content: center;
-
-                        // チェックボックスアイコン
-                        &::before {
-                            font-family: 'Material Icons';
-                            content: '\e836';
-                            font-size: 2.1rem;
-                            padding-right: 3%;
-                        }
+                        padding-bottom: 10px;
                     }
 
                     // パスワードを忘れたら
@@ -344,11 +333,8 @@
                         display: flex;
                         align-items: center;
 
-                        // 矢印アイコン
-                        &::before {
-                            font-family: 'Material Icons';
-                            content: '\e5cc';
-                            font-size: 2.1rem;
+                        .material-icons-outlined {
+                            padding: 0;
                         }
                     }
                 }
@@ -480,10 +466,8 @@
                 padding: 5%;
                 font-size: 1.5rem;
 
-                &::before {
-                    font-family: 'Material Icons';
-                    content: '\e5cc';
-                    font-size: 2.1rem;
+                .material-icons-outlined {
+                    font-size: 1.8rem;
                 }
             }
         }

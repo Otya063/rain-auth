@@ -13,7 +13,6 @@
     export let form: ActionData;
     let btnStage = 0;
     let warning = true;
-    let captcha = false;
 
     onMount(() => {
         // for waiting captcha
@@ -21,8 +20,8 @@
 
         setTimeout(() => {
             warning = false;
-            captcha = true;
             switchBtnInAuth(true, btnElm);
+            document.getElementsByClassName('form_area')[0].classList.remove('disabled_elm');
             btnStage = 1;
         }, 3000);
     });
@@ -60,7 +59,7 @@
     {/if}
 
     <form
-        class="form_area"
+        class="form_area disabled_elm"
         action="?/login"
         method="POST"
         use:enhance={() => {
@@ -86,23 +85,41 @@
             };
         }}
     >
-        {#if captcha}
-            <div in:slide={{ duration: 800, axis: 'y' }} class="form_area_item">
-                <label for="username" class="part_label">{$LL.login['usernameLabel']()}</label>
-                <input class="part_input" class:error_input={form?.errorUsername} id="username" name="username" type="text" placeholder={$LL.login['usernameLabel']()} autocomplete="off" />
+        <div in:slide={{ duration: 800, axis: 'y' }} class="form_area_item">
+            <label for="username" class="part_label">{$LL.login['usernameLabel']()}</label>
+            <input class="part_input" class:error_input={form?.errorUsername} id="username" name="username" type="text" placeholder={$LL.login['usernameLabel']()} autocomplete="off" />
 
-                <label for="password" class="part_label">{$LL.login['passwordLabel']()}</label>
-                <input class="part_input" class:error_input={form?.errorPassword} id="password" name="password" type="password" placeholder={$LL.login['passwordLabel']()} autocomplete="off" />
+            <label for="password" class="part_label">{$LL.login['passwordLabel']()}</label>
+            <input class="part_input" class:error_input={form?.errorPassword} id="password" name="password" type="password" placeholder={$LL.login['passwordLabel']()} autocomplete="off" />
 
-                <div class="wrap_part_label">
-                    <input class="part_input" style="display: none;" id="remember_me" name="remember_me" type="checkbox" />
-                    <label for="remember_me">{$LL.login['rememberMe']()}</label>
-                    <button class="forgot_password" on:click={(e) => loadArticle(e, $page.url, $locale, 'login/?type=reset-password')} type="button">{$LL.login['forgotPassword']()}</button>
-                </div>
+            <div class="wrap_part_label">
+                <label for="remember_me">
+                    <span class="material-icons-outlined remember">radio_button_unchecked</span>
+                    <input
+                        class="part_input"
+                        style="display: none;"
+                        id="remember_me"
+                        name="remember_me"
+                        type="checkbox"
+                        on:change={() => {
+                            document.getElementsByClassName('remember')[0].textContent =
+                                document.getElementsByClassName('remember')[0].textContent === 'radio_button_unchecked' ? 'radio_button_checked' : 'radio_button_unchecked';
+                        }}
+                    />
+                    {$LL.login['rememberMe']()}
+                </label>
+
+                <button class="forgot_password" on:click={(e) => loadArticle(e, $page.url, $locale, 'login/?type=reset-password')} type="button">
+                    <span class="material-icons-outlined">chevron_right</span>
+                    {$LL.login['forgotPassword']()}
+                </button>
             </div>
+        </div>
 
-            <button class="form_area_msg_only" on:click={(e) => loadArticle(e, $page.url, $locale, 'register/')} type="button">{$LL.login['notRegister']()}</button>
-        {/if}
+        <button class="form_area_msg_only" on:click={(e) => loadArticle(e, $page.url, $locale, 'register/')} type="button">
+            <span class="material-icons-outlined">chevron_right</span>
+            {$LL.login['notRegister']()}
+        </button>
 
         <Turnstile siteKey={PUBLIC_TURNSTILE_SITE_KEY} />
 
