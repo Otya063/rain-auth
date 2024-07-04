@@ -67,7 +67,7 @@
             const nowBtnStage = btnStage;
             const btnElm = document.getElementById('btn');
             const labelElm = document.getElementsByClassName('part_label');
-            const inputElm = document.querySelectorAll('.part_input, .wrap_part_label');
+            const inputElm = document.querySelectorAll('.part_input, .wrap_part_label, .form_area_msg_only');
             switchBtnInAuth(false, btnElm, labelElm, inputElm);
             btnStage = 0;
 
