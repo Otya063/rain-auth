@@ -123,7 +123,7 @@
 
         <Turnstile siteKey={PUBLIC_TURNSTILE_SITE_KEY} />
 
-        <button id="btn" class="blue_btn loading_btn disabled_elm" type="submit">
+        <button id="btn" class="blue_btn loading_btn disabled_elm" type={warning ? 'button' : 'submit'}>
             {#if btnStage === 0}
                 <span in:fade class="loading"></span>
             {:else}
