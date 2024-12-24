@@ -11,7 +11,6 @@
     const { url } = data;
     const origin = url.origin;
     const pathname = url.pathname;
-    console.log(url);
 
     // at the top, set the locale before the store is accessed and before the actual rendering takes place
     setLocale(data.locale);
