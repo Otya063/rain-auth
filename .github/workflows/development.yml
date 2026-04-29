@@ -1,4 +1,4 @@
-name: 'Rain Auth'
+name: 'Rain Auth Dev'
 on:
     workflow_dispatch:
     push:
