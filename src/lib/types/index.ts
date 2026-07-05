@@ -1,7 +1,8 @@
 export * from './discord';
-export * from './api';
+export * from './postgres';
+export * from './session';
 
-/* Discord Account Linking Character Data
+/* ディスコード連携用キャラクターデータ
 ====================================================*/
 export interface LinkedCharacterData {
     id: number;
@@ -11,11 +12,11 @@ export interface LinkedCharacterData {
     weapon: string;
 }
 
-/* Rain Web Information Type
+/* Rain Webのお知らせ種別
 ====================================================*/
 export type InformationType = 'IMP' | 'DNT' | 'MAS' | 'IGE' | 'UAM' | 'ALL';
 
-/* Weapon Name Type
+/* 武器名の型
 ====================================================*/
 export type WeaponType = WeaponJapanse | WeaponEnglish | 'Invalid Input';
 
@@ -51,14 +52,14 @@ type WeaponEnglish =
     | 'Switch Axe F'
     | 'Magnet Spike';
 
-/* Validate Token
+/* トークン検証
 ====================================================*/
 export interface ValidateToken {
     validateSuccess: boolean;
     validateError: string | null;
 }
 
-/* Turnstile Fetch Response
+/* Turnstileのレスポンス
 ====================================================*/
 export interface TokenValidateResponse {
     'error-codes': string[];

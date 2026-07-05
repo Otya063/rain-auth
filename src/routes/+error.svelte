@@ -1,17 +1,19 @@
 <script lang="ts">
     import type { LayoutData } from './$types';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import LL, { setLocale } from '$i18n/i18n-svelte';
     import { onMount } from 'svelte';
     import '$scss/style_error.scss';
 
-    export let data: LayoutData;
-    const { url } = data;
-    const origin = url.origin;
-    const status = $page.status;
-    setLocale(data.locale);
+    let { data }: { data: LayoutData } = $props();
+    let origin = $derived(data.url.origin);
+    let status = $derived(page.status);
 
-    // break out of the application-side layout
+    $effect(() => {
+        setLocale(data.locale);
+    });
+
+    // アプリ側レイアウトの外に出す
     onMount(() => {
         const wrapper = document.getElementById('wrapper');
         wrapper?.classList.add('disable_default_wrapper');
@@ -45,7 +47,7 @@
         <div class="inner_text_error">
             <p>
                 <!-- message1 -->
-                {#if !$page.error?.message1}
+                {#if !page.error?.message1}
                     {#if status === 404}
                         {$LL.error[404].message1()}
                     {:else if status === 403 || status === 401}
@@ -60,13 +62,13 @@
                         {$LL.error['otherMessage1']()}
                     {/if}
                 {:else}
-                    {$page.error?.message1}
+                    {page.error?.message1}
                 {/if}
             </p>
 
             <ul class="error_cause">
                 <!-- message2 -->
-                {#if !$page.error?.message2}
+                {#if !page.error?.message2}
                     {#if status === 404}
                         {#each Object.entries($LL.error[404].message2) as [_, cause]}
                             <li>{cause()}</li>
@@ -75,21 +77,21 @@
                         {#each Object.entries($LL.error[403].message2) as [_, cause]}
                             <li>{cause()}</li>
                         {/each}
-                    {:else if (status === 400 || status === 500) && !!$page.error?.message}
-                        <li>{$page.error?.message}</li>
+                    {:else if (status === 400 || status === 500) && !!page.error?.message}
+                        <li>{page.error?.message}</li>
                     {:else}
                         <li>{$LL.error['otherMessage2']()}</li>
                     {/if}
                 {:else}
-                    {#each Object.entries($page.error?.message2) as [_, cause]}
-                        <li>{cause}</li>
+                    {#each Object.entries(page.error?.message2) as [_, cause]}
+                        <li>{@html cause}</li>
                     {/each}
                 {/if}
             </ul>
 
             <p>
                 <!-- message3 -->
-                {#if !$page.error?.message3}
+                {#if !page.error?.message3}
                     {#if status === 404}
                         {$LL.error[404].message3()}
                     {:else if status === 403}
@@ -98,7 +100,7 @@
                         {$LL.error[500].message3()}
                     {/if}
                 {:else}
-                    {@html $page.error?.message3}
+                    {@html page.error?.message3}
                 {/if}
             </p>
         </div>
@@ -126,7 +128,7 @@
                     ? $LL.error[422].title()
                     : status === 500
                       ? $LL.error[500].title()
-                      : $page.error?.message} | {$LL.serverTitle()}</title
+                      : page.error?.message} | {$LL.serverTitle()}</title
     >
 
     <meta name="robots" content="noindex,nofollow" />
@@ -144,8 +146,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <!-- font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="true" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
     {#if data.locale === 'ja'}
         <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;500;700&display=swap" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;500;700&display=swap" />

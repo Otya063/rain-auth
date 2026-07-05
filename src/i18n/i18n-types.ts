@@ -274,6 +274,10 @@ type RootTranslation = {
 		 */
 		codeNotMatch: string
 		/**
+		 * T​h​e​ ​n​e​w​ ​p​a​s​s​w​o​r​d​ ​m​u​s​t​ ​b​e​ ​d​i​f​f​e​r​e​n​t​ ​f​r​o​m​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​p​a​s​s​w​o​r​d​.
+		 */
+		samePassword: string
+		/**
 		 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​c​o​d​e​ ​t​o​ ​c​o​m​p​l​e​t​e​ ​t​h​i​s​ ​p​r​o​c​e​d​u​r​e​.​
 	​A​c​c​e​s​s​ ​t​o​ ​t​h​e​ ​"​{​s​i​t​e​}​"​ ​s​i​t​e​ ​i​s​ ​v​a​l​i​d​ ​f​o​r​ ​{​t​i​m​e​}​ ​m​i​n​u​t​e​s​ ​i​m​m​e​d​i​a​t​e​l​y​ ​a​f​t​e​r​ ​t​h​i​s​ ​c​o​d​e​ ​i​s​ ​i​s​s​u​e​d​.​ ​A​l​s​o​,​ ​i​f​ ​y​o​u​ ​c​l​o​s​e​ ​t​h​e​ ​t​a​b​ ​o​r​ ​r​e​f​r​e​s​h​ ​t​h​e​ ​s​i​t​e​,​ ​y​o​u​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e​ ​t​o​ ​a​c​c​e​s​s​ ​t​h​e​ ​s​i​t​e​.
 		 * @param {string} site
@@ -507,7 +511,7 @@ type RootTranslation = {
 		 */
 		invalidCaptcha: string
 		/**
-		 * F​a​i​l​e​d​ ​t​o​ ​c​o​m​m​u​n​i​c​a​t​e​ ​w​i​t​h​ ​R​a​i​n​ ​A​P​I​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​:
+		 * F​a​i​l​e​d​ ​t​o​ ​p​r​o​c​e​s​s​ ​d​a​t​a​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​:
 		 */
 		failedApiMsg1: string
 		/**
@@ -526,6 +530,10 @@ type RootTranslation = {
 		 * I​n​v​a​l​i​d​ ​d​a​t​a​ ​w​a​s​ ​p​a​s​s​e​d​.
 		 */
 		passedInvalidData: string
+		/**
+		 * P​l​e​a​s​e​ ​c​o​m​p​l​e​t​e​ ​t​h​e​ ​a​c​c​o​u​n​t​ ​l​i​n​k​a​g​e​ ​f​i​r​s​t​ ​f​r​o​m​ ​"​L​i​n​k​ ​D​i​s​c​o​r​d​"​ ​o​n​ ​t​h​e​ ​l​o​g​i​n​ ​s​c​r​e​e​n​ ​i​n​ ​t​h​e​ ​l​a​u​n​c​h​e​r​.
+		 */
+		linkDiscordFirst: string
 		oauth: {
 			/**
 			 * F​a​i​l​e​d​ ​t​o​ ​a​u​t​h​o​r​i​z​e​ ​y​o​u​r​ ​d​i​s​c​o​r​d​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​s​:
@@ -557,10 +565,6 @@ type RootTranslation = {
 			 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​u​s​e​r​ ​d​a​t​a​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​s​:
 			 */
 			failedCreateUser: string
-			/**
-			 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​c​h​a​r​a​c​t​e​r​ ​d​a​t​a​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​s​:
-			 */
-			failedCreateCharacter: string
 		}
 		login: {
 			/**
@@ -616,6 +620,12 @@ type RootTranslation = {
 			 * F​o​r​ ​a​d​m​i​n​i​s​t​r​a​t​o​r​s​:​ ​c​h​e​c​k​ ​t​h​a​t​ ​t​h​e​ ​b​o​t​'​s​ ​p​e​r​m​i​s​s​i​o​n​s​ ​a​r​e​ ​c​o​r​r​e​c​t​.
 			 */
 			failedAddRoleMsg3: string
+		}
+		switchCharacter: {
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​w​i​t​c​h​ ​t​h​e​ ​l​i​n​k​e​d​ ​c​h​a​r​a​c​t​e​r​ ​f​o​r​ ​t​h​e​ ​f​o​l​l​o​w​i​n​g​ ​r​e​a​s​o​n​:
+			 */
+			failedSwitchMsg1: string
 		}
 	}
 }
@@ -879,6 +889,10 @@ export type TranslationFunctions = {
 		 */
 		codeNotMatch: () => LocalizedString
 		/**
+		 * The new password must be different from your current password.
+		 */
+		samePassword: () => LocalizedString
+		/**
 		 * Please enter the following verification code to complete this procedure.
 	Access to the "{site}" site is valid for {time} minutes immediately after this code is issued. Also, if you close the tab or refresh the site, you will not be able to access the site.
 		 */
@@ -1110,7 +1124,7 @@ export type TranslationFunctions = {
 		 */
 		invalidCaptcha: () => LocalizedString
 		/**
-		 * Failed to communicate with Rain API for the following reason:
+		 * Failed to process data for the following reason:
 		 */
 		failedApiMsg1: () => LocalizedString
 		/**
@@ -1129,6 +1143,10 @@ export type TranslationFunctions = {
 		 * Invalid data was passed.
 		 */
 		passedInvalidData: () => LocalizedString
+		/**
+		 * Please complete the account linkage first from "Link Discord" on the login screen in the launcher.
+		 */
+		linkDiscordFirst: () => LocalizedString
 		oauth: {
 			/**
 			 * Failed to authorize your discord account for the following reasons:
@@ -1160,10 +1178,6 @@ export type TranslationFunctions = {
 			 * Failed to create user data for the following reasons:
 			 */
 			failedCreateUser: () => LocalizedString
-			/**
-			 * Failed to create character data for the following reasons:
-			 */
-			failedCreateCharacter: () => LocalizedString
 		}
 		login: {
 			/**
@@ -1218,6 +1232,12 @@ export type TranslationFunctions = {
 			 * For administrators: check that the bot's permissions are correct.
 			 */
 			failedAddRoleMsg3: () => LocalizedString
+		}
+		switchCharacter: {
+			/**
+			 * Failed to switch the linked character for the following reason:
+			 */
+			failedSwitchMsg1: () => LocalizedString
 		}
 	}
 }

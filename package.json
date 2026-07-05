@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "npm-run-all --parallel vite typesafe-i18n",
+		"dev": "pnpm run --parallel \"/^(vite|typesafe-i18n)$/\"",
 		"vite": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -11,38 +11,42 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"typesafe-i18n": "typesafe-i18n"
 	},
+	"packageManager": "pnpm@10.27.0",
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20240620.0",
-		"@sveltejs/adapter-auto": "^3.2.2",
-		"@sveltejs/adapter-cloudflare-workers": "^2.5.0",
-		"@sveltejs/kit": "^2.5.18",
-		"@sveltejs/vite-plugin-svelte": "^3.1.1",
-		"@types/bcryptjs": "^2.4.6",
+		"@cloudflare/workers-types": "^5.20260703.1",
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/adapter-cloudflare": "^7.2.9",
+		"@sveltejs/kit": "^2.69.1",
+		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"@types/bcryptjs": "^3.0.0",
 		"@types/gtag.js": "^0.0.20",
-		"@types/lodash": "^4.17.6",
-		"@types/luxon": "^3.4.2",
-		"@types/node": "^20.14.9",
-		"bcryptjs": "^2.4.3",
-		"npm-run-all": "^4.1.5",
-		"prettier": "^3.4.2",
-		"prettier-plugin-svelte": "^3.3.2",
-		"prisma": "^5.16.1",
-		"sass": "^1.77.6",
-		"svelte": "^4.2.18",
-		"svelte-check": "^3.8.4",
-		"svelte-turnstile": "^0.7.0",
-		"tslib": "^2.6.3",
-		"typescript": "^5.5.3",
-		"vite": "^5.3.3",
-		"wrangler": "^3.63.1"
+		"@types/luxon": "^3.7.2",
+		"@types/node": "^26.1.0",
+		"bcryptjs": "^3.0.3",
+		"prettier": "^3.9.4",
+		"prettier-plugin-svelte": "^4.1.1",
+		"sass": "^1.101.0",
+		"svelte": "^5.56.4",
+		"svelte-check": "^4.7.1",
+		"svelte-turnstile": "^0.11.0",
+		"tslib": "^2.8.1",
+		"typescript": "^6.0.3",
+		"vite": "^8.1.3",
+		"wrangler": "^4.107.0"
 	},
 	"type": "module",
 	"dependencies": {
-		"@prisma/client": "^5.16.1",
-		"@prisma/extension-accelerate": "^1.1.0",
-		"check-password-strength": "^2.0.10",
-		"lodash": "^4.17.21",
-		"luxon": "^3.4.4",
-		"typesafe-i18n": "^5.26.2"
+		"check-password-strength": "^3.0.0",
+		"luxon": "^3.7.2",
+		"postgres": "^3.4.5",
+		"typesafe-i18n": "^5.27.1"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@parcel/watcher",
+			"esbuild",
+			"sharp",
+			"workerd"
+		]
 	}
 }

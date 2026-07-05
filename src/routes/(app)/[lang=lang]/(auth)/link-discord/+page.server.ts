@@ -1,19 +1,16 @@
 import type { PageServerLoad } from './$types';
-import type { characters, discord, discord_register, users } from '@prisma/client/edge';
-import { error, type Action, type Actions, fail, type NumericRange } from '@sveltejs/kit';
+import { error, type Action, type Actions, fail } from '@sveltejs/kit';
 import { TURNSTILE_SECRET_KEY } from '$env/static/private';
-import ServerData, { db } from '$lib/database';
-import { getGuildMember, getUserData, addRoleToUser, sendDirectMessages } from '$lib/discord';
-import type { LinkDiscordGetData, RainApiPostResponseData, LinkedCharacterData } from '$lib/types';
-import { convFormDataToObj, convHrpToHr, getWpnTypeByDec, validateToken } from '$lib/utils';
+import { PostgresManager, getGuildMember, getUserData, addRoleToUser, sendDirectMessages, convFormDataToObj, convHrpToHr, getWpnTypeByDec, validateToken } from '$lib/utils/server';
+import type { LinkDiscordData } from '$lib/types';
 import bcrypt from 'bcryptjs';
-import _ from 'lodash';
 import { DateTime } from 'luxon';
 
-const startTime = DateTime.local();
-let hashedVerificationCode: string;
-let userKey: string;
-let ttl: number;
+const LINK_DISCORD_TTL_SECONDS = 60 * 10;
+
+let linkDiscordData: LinkDiscordData | undefined;
+let linkDiscordStartTime: DateTime | undefined;
+let hashedVerificationCode: string | undefined;
 
 export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) => {
     const code = url.searchParams.get('code');
@@ -34,50 +31,15 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
     const discordId = userData.id;
     const discordUsername = userData.username;
     const discordAvatar = userData.avatar;
-    const discordData: discord | null = await ServerData.getLinkedCharactersByDiscordId(discordId);
-    const discordRegisterData: discord_register | null = await ServerData.getLinkedUserByDiscordId(discordId);
-    if (discordData || discordRegisterData) {
+    const { charId: linkedCharId, userId: linkedUserId } = await new PostgresManager('get', 'discordData', { discordId }).execute();
+    if (linkedCharId || linkedUserId) {
         throw error(400, { message: '', message1: LL.error['oauth'].message1(), message2: [LL.error['linkDiscord'].existLinkedUser()], message3: LL.error['startOverMsg3']() });
     }
 
     tokenData = null;
 
-    const { resStatus, resStatusText } = await (async () => {
-        try {
-            const res = await fetch(`https://api.rain-server.com/link-discord`, {
-                method: 'POST',
-                body: JSON.stringify({ discord_access_token: discordAccessToken, discord_id: discordId, discord_username: discordUsername, discord_avatar: discordAvatar }),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Origin': url.origin,
-                },
-            });
-            const resJson: RainApiPostResponseData = await res.json();
-            const resStatus = res.status;
-            const resStatusText = res.statusText;
-            userKey = resJson.user_key;
-            ttl = resJson.expire_ttl;
-
-            return { resStatus, resStatusText };
-        } catch (err) {
-            if (err instanceof Error) {
-                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-            } else if (typeof err === 'string') {
-                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-            } else {
-                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
-            }
-        }
-    })();
-
-    if (resStatus !== 201) {
-        throw error(resStatus as NumericRange<400, 599>, {
-            message: '',
-            message1: LL.error['failedApiMsg1'](),
-            message2: resStatusText === 'NO_REQUIRED_DATA' ? [LL.error['passedInvalidData']()] : resStatusText === 'UNEXPECTED' ? [LL.error['unexpectedErr']()] : [resStatusText],
-            message3: LL.error['startOverMsg3'](),
-        });
-    }
+    linkDiscordData = { discordAccessToken, discordId, discordUsername, discordAvatar };
+    linkDiscordStartTime = DateTime.local();
 
     const salt = await bcrypt.genSalt(12);
     const plainVerificationCode = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).substring(0, 16);
@@ -95,7 +57,7 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
     return { discordId, discordUsername };
 };
 
-const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => {
+const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
     const data = await request.formData();
     const { stage } = convFormDataToObj(data);
 
@@ -105,15 +67,19 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
         }
 
         case 2: {
-            const { verification_code } = convFormDataToObj(data);
-            const correctCode: boolean = await bcrypt.compare(String(verification_code), hashedVerificationCode);
+            if (!hashedVerificationCode) {
+                return fail(400, { error: true, unauthOps: true });
+            }
 
-            // code validation
+            const { verification_code } = convFormDataToObj(data);
+            const correctCode = await bcrypt.compare(String(verification_code), hashedVerificationCode);
+
+            // コードの検証
             if (!correctCode) {
                 return fail(400, { error: true, codeNotMatch: true, errorCode: true });
             }
 
-            // turnstile captcha validation
+            // turnstileキャプチャの検証
             const token = data.get('cf-turnstile-response');
             const { validateSuccess, validateError } = await validateToken(String(token), TURNSTILE_SECRET_KEY);
             if (!validateSuccess) {
@@ -124,155 +90,78 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
         }
 
         case 3: {
+            if (!linkDiscordData || !linkDiscordStartTime) {
+                return fail(400, { error: true, unauthOps: true });
+            }
+
             const { username, password } = convFormDataToObj(data);
 
-            // username validations
+            // ユーザー名のバリデーション
             if (typeof username !== 'string' || !username) {
                 return fail(400, { error: true, invalidUsername: true, errorUsername: true });
             }
 
-            // check if the user exists
-            const user: users | null = await ServerData.getUserByUsername(String(username));
+            // ユーザーの存在確認
+            const user = await new PostgresManager('get', 'userByUsername', { username }).execute();
             if (!user) {
                 return fail(400, { error: true, noUser: true, errorUsername: true });
             }
 
-            // password validations
+            // パスワードのバリデーション
             if (typeof password !== 'string' || !password) {
                 return fail(400, { error: true, invalidPassword: true, errorPassword: true });
             }
-            const correctPass = await bcrypt.compare(String(password), user.password);
+            const correctPass = await bcrypt.compare(password, user.password);
             if (!correctPass) {
                 return fail(400, { error: true, incPassword: true, errorPassword: true });
             }
 
-            // check if the user account is linked
-            const linkedUser: discord_register | null = await ServerData.getLinkedUserByUserId(user.id);
-            if (linkedUser) {
+            // アカウントが連携済みか確認
+            const discordExist = await new PostgresManager('get', 'chkDiscordExist', { userId: user.id }).execute();
+            if (discordExist) {
                 return fail(400, { error: true, userLinked: true, errorUsername: true, errorPassword: true });
             }
 
-            const stage3Time = DateTime.local();
-            const diffSecondsTime = String(stage3Time.diff(startTime, 'seconds').toObject().seconds);
-            const restSecondsTime = ttl - Number(diffSecondsTime.substring(0, diffSecondsTime.indexOf('.')));
-            if (Math.sign(restSecondsTime) === -1 || Math.sign(restSecondsTime) === 0) {
+            // セッションの検証
+            const elapsedSeconds = DateTime.local().diff(linkDiscordStartTime, 'seconds').seconds;
+            if (elapsedSeconds > LINK_DISCORD_TTL_SECONDS) {
                 throw error(401, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
             }
 
-            const { resStatus, resStatusText } = await (async () => {
-                try {
-                    const res = await fetch(`https://api.rain-server.com/link-discord/${userKey}`, {
-                        method: 'PATCH',
-                        body: JSON.stringify({ rest_expire_ttl: restSecondsTime, user_id: user.id }),
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Origin': url.origin,
-                        },
-                    });
+            linkDiscordData.userId = user.id;
 
-                    const resStatus = res.status;
-                    const resStatusText = res.statusText;
-
-                    return { resStatus, resStatusText };
-                } catch (err) {
-                    if (err instanceof Error) {
-                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-                    } else if (typeof err === 'string') {
-                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-                    } else {
-                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
-                    }
-                }
-            })();
-
-            if (resStatus !== 204) {
-                throw error(resStatus as NumericRange<400, 599>, {
-                    message: '',
-                    message1: LL.error['failedApiMsg1'](),
-                    message2:
-                        resStatusText === 'PARAMS_UNDEFINED'
-                            ? [LL.error['paramsUndefined']()]
-                            : resStatusText === 'NO_REQUIRED_DATA'
-                            ? [LL.error['passedInvalidData']()]
-                            : resStatusText === 'TIMEOUT'
-                            ? [LL.error['sessionExpired']()]
-                            : resStatusText === 'NO_DATA'
-                            ? [LL.error['noPreRegData'](), LL.error['sessionExpired']()]
-                            : resStatusText === 'UNEXPECTED'
-                            ? [LL.error['unexpectedErr']()]
-                            : [resStatusText],
-                    message3: LL.error['startOverMsg3'](),
-                });
-            }
-
-            const charData: characters[] = await ServerData.getCharactersByUserId(user.id);
-            let characterData: LinkedCharacterData[] = [];
-            charData.forEach((character) => {
-                characterData.push({ id: character.id, name: character.name, hr: convHrpToHr(character.hrp), gr: character.gr, weapon: getWpnTypeByDec(character.weapon_type, locale) });
-            });
+            const charData = await new PostgresManager('get', 'charactersByUserId', { userId: user.id }).execute();
+            const characterData = charData.map((character) => ({
+                id: character.id,
+                name: character.name,
+                hr: convHrpToHr(character.hrp),
+                gr: character.gr,
+                weapon: getWpnTypeByDec(character.weapon_type, locale),
+            }));
 
             return { currentStage: 3, nextStage: 4, characterData };
         }
 
         case 4: {
-            const { character_data } = convFormDataToObj(data);
-            const charData: string[] = String(character_data).split('-');
-            const charId: number = Number(charData[0]);
-            const charName: string = charData[1];
-            const charInfo: string = charData[2];
-
-            const { fetchData, resStatus, resStatusText } = await (async () => {
-                try {
-                    const res = await fetch(`https://api.rain-server.com/link-discord/${userKey}`, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Origin': url.origin,
-                        },
-                    });
-
-                    const fetchData = (await res.json()) as LinkDiscordGetData;
-                    const resStatus = res.status;
-                    const resStatusText = res.statusText;
-
-                    return { fetchData, resStatus, resStatusText };
-                } catch (err) {
-                    if (err instanceof Error) {
-                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err.message], message3: LL.error['startOverMsg3']() });
-                    } else if (typeof err === 'string') {
-                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [err], message3: LL.error['startOverMsg3']() });
-                    } else {
-                        throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: undefined, message3: LL.error['startOverMsg3']() });
-                    }
-                }
-            })();
-
-            if (resStatus !== 200) {
-                throw error(resStatus as NumericRange<400, 599>, {
-                    message: '',
-                    message1: LL.error['failedApiMsg1'](),
-                    message2:
-                        resStatusText === 'PARAMS_UNDEFINED'
-                            ? [LL.error['paramsUndefined']()]
-                            : resStatusText === 'NO_DATA'
-                            ? [LL.error['noPreRegData'](), LL.error['sessionExpired']()]
-                            : resStatusText === 'UNEXPECTED'
-                            ? [LL.error['unexpectedErr']()]
-                            : [resStatusText],
-                    message3: LL.error['startOverMsg3'](),
-                });
+            if (!linkDiscordData?.userId) {
+                return fail(400, { error: true, unauthOps: true });
             }
 
-            //const guildMemberData = await getGuildMember('937230168223789066', fetchData.discord_access_token); prod
-            const guildMemberData = await getGuildMember('1177982376945668146', fetchData.discord_access_token);
+            const { discordAccessToken, discordId, discordUsername, discordAvatar, userId } = linkDiscordData;
+
+            const { character_data } = convFormDataToObj(data);
+            const charData: string[] = String(character_data).split('-');
+            const charId = Number(charData[0]);
+            const charName = charData[1];
+            const charInfo = charData[2];
+
+            const guildMemberData = await getGuildMember(discordAccessToken);
             if (!guildMemberData) {
                 throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [LL.error['linkDiscord'].notJoinedDiscord()], message3: LL.error['startOverMsg3']() });
             }
 
-            // prod: 1017643913667936318
-            if (!guildMemberData.roles.includes('1181583278956892222')) {
-                //const registeredRoleStatus: number = await addRoleToUser('937230168223789066', fetchData.discord_id, '1017643913667936318'); prod
-                const registeredRoleStatus: number = await addRoleToUser('1177982376945668146', fetchData.discord_id, '1181583278956892222');
+            if (!guildMemberData.roles.includes('1017643913667936318')) {
+                const registeredRoleStatus = await addRoleToUser(discordId, '1017643913667936318');
                 if (registeredRoleStatus !== 204) {
                     throw error(400, {
                         message: '',
@@ -283,8 +172,8 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
                 }
             }
 
-            const character: characters[] = await ServerData.getCharactersByUserId(fetchData.user_id!);
-            const filteredChar: characters | undefined = _.find(character, (data) => data.id === charId);
+            const character = await new PostgresManager('get', 'charactersByUserId', { userId }).execute();
+            const filteredChar = character.find((c) => c.id === charId);
             if (!filteredChar) {
                 throw error(400, {
                     message: '',
@@ -294,31 +183,16 @@ const linkDiscord: Action = async ({ url, locals: { LL, locale }, request }) => 
                 });
             }
 
-            try {
-                await db.discord.create({
-                    data: {
-                        char_id: charId,
-                        discord_id: String(fetchData.discord_id),
-                    },
-                });
-
-                await db.discord_register.create({
-                    data: {
-                        user_id: fetchData.user_id!,
-                        discord_id: String(fetchData.discord_id),
-                    },
-                });
-
-                return { currentStage: 4, nextStage: 5, discordUsername: fetchData.discord_username, discordAvatar: fetchData.discord_avatar, selectedCharName: charName, selectedCharInfo: charInfo };
-            } catch (err) {
-                if (err instanceof Error) {
-                    throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [err.message], message3: LL.error['startOverMsg3']() });
-                } else if (typeof err === 'string') {
-                    throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [err], message3: LL.error['startOverMsg3']() });
-                } else {
-                    throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: undefined, message3: LL.error['startOverMsg3']() });
-                }
+            const { success: discordLinked, message: discordLinkMsg } = await new PostgresManager('create', 'discordLink', { charId, userId, discordId }).execute();
+            if (!discordLinked) {
+                throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [discordLinkMsg], message3: LL.error['startOverMsg3']() });
             }
+
+            linkDiscordData = undefined;
+            linkDiscordStartTime = undefined;
+            hashedVerificationCode = undefined;
+
+            return { currentStage: 4, nextStage: 5, discordUsername, discordAvatar, selectedCharName: charName, selectedCharInfo: charInfo };
         }
 
         default: {

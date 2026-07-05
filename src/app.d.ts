@@ -1,3 +1,4 @@
+import type { KVNamespace } from '@cloudflare/workers-types';
 import type { Locales, TranslationFunctions } from '$i18n/i18n-types';
 import type { Token } from '$lib/types';
 
@@ -18,6 +19,7 @@ declare global {
             env: {
                 MAINTENANCE_MODE: string;
                 MAINTENANCE_DATE: string;
+                DB_CONFIG: KVNamespace;
             }
         }
     }

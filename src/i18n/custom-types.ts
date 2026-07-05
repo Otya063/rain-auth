@@ -1,1 +1,1 @@
-// use this file to export your custom types; these types will be imported by './i18n-types.ts'
+// カスタム型をエクスポートするファイル ここでエクスポートした型は './i18n-types.ts' にインポートされる

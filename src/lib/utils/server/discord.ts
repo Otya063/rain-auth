@@ -2,7 +2,7 @@ import type { Token, User, Channel, Message, GuildMember } from '$lib/types';
 import type { TranslationFunctions } from '$i18n/i18n-types';
 import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_CALLBACK_URI, DISCORD_BOT_TOKEN } from '$env/static/private';
 
-/* Get Token Data for Authorization
+/* 認証用トークンデータの取得
 ====================================================*/
 export const getToken = async (code: string, type: string): Promise<Token | null> => {
     const body = new URLSearchParams({
@@ -22,7 +22,7 @@ export const getToken = async (code: string, type: string): Promise<Token | null
     return res.ok ? await res.json() : null;
 };
 
-/* Get User Data in Discord Oauth
+/* Discord Oauthでのユーザーデータ取得
 ====================================================*/
 export const getUserData = async (accessToken: string): Promise<User | null> => {
     const res = await fetch('https://discord.com/api/users/@me', {
@@ -33,7 +33,7 @@ export const getUserData = async (accessToken: string): Promise<User | null> => 
     return res.ok ? await res.json() : null;
 };
 
-/* Send Direct Message to Specified User
+/* 指定ユーザーへのダイレクトメッセージ送信
 ====================================================*/
 export const sendDirectMessages = async (userId: string, verificationCode: string, time: number, type: string, LL: TranslationFunctions): Promise<Message | null> => {
     const body = JSON.stringify({
@@ -94,10 +94,8 @@ export const sendDirectMessages = async (userId: string, verificationCode: strin
     return res1.ok ? await res1.json() : null;
 };
 
-/* Get Member Info (Me) for a Guild With a Specified ID
-====================================================*/
-export const getGuildMember = async (guildId: string, accessToken: string): Promise<GuildMember | null> => {
-    const res = await fetch(`https://discordapp.com/api/users/@me/guilds/${guildId}/member`, {
+export const getGuildMember = async (accessToken: string): Promise<GuildMember | null> => {
+    const res = await fetch(`https://discordapp.com/api/users/@me/guilds/937230168223789066/member`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${accessToken}` },
     });
@@ -105,13 +103,15 @@ export const getGuildMember = async (guildId: string, accessToken: string): Prom
     return res.ok ? await res.json() : null;
 };
 
-/* Add Role to a Specified User
-====================================================*/
-export const addRoleToUser = async (guildId: string, userId: string, roleId: string): Promise<number> => {
-    const res = await fetch(`https://discordapp.com/api/guilds/${guildId}/members/${userId}/roles/${roleId}`, {
+export const addRoleToUser = async (userId: string, roleId: string): Promise<number> => {
+    const res = await fetch(`https://discordapp.com/api/guilds/937230168223789066/members/${userId}/roles/${roleId}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN}` },
     });
 
-    return res.ok ? res.status : 400;
+    if (!res.ok) {
+        console.error(`addRoleToUser failed: status=${res.status} body=${await res.text()}`);
+    }
+
+    return res.status;
 };

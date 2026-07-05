@@ -1,14 +1,18 @@
-<script lang="ts">
-    import { page } from '$app/stores';
+<script module lang="ts">
+    declare function gtag(command: string, ...args: unknown[]): void;
+</script>
 
-    $: {
+<script lang="ts">
+    import { page } from '$app/state';
+
+    $effect(() => {
         if (typeof gtag !== 'undefined') {
             gtag('config', 'G-VZ70964E0G', {
                 page_title: document.title,
-                page_path: $page.url.pathname,
+                page_path: page.url.pathname,
             });
         }
-    }
+    });
 </script>
 
 <svelte:head>

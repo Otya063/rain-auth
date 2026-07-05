@@ -5,7 +5,7 @@ export interface Token {
     scope: string;
 }
 
-/* Application Resource
+/* アプリケーションリソース
 ====================================================*/
 interface Application {
     id: string;
@@ -19,7 +19,7 @@ interface Application {
     terms_of_service_url?: string;
     privacy_policy_url?: string;
     owner?: Partial<User>;
-    summary: string; // deprecated and will be removed in v11
+    summary: string; // 非推奨 v11で削除予定
     verify_key: string;
     team: Team | null;
     guild_id?: string;
@@ -42,7 +42,7 @@ interface InstallParams {
     permissions: string;
 }
 
-/* Channels Resource
+/* チャンネルリソース
 ====================================================*/
 export interface Channel {
     id: string;
@@ -63,7 +63,7 @@ export interface Channel {
     application_id?: string;
     managed?: boolean;
     parent_id?: string | null;
-    last_pin_timestamp?: string | null; // ISO8601 timestamp
+    last_pin_timestamp?: string | null; // ISO8601形式のタイムスタンプ
     rtc_region?: string | null;
     video_quality_mode?: number;
     message_count?: number;
@@ -87,8 +87,8 @@ export interface Message {
     channel_id: string;
     author: User;
     content: string;
-    timestamp: string; // ISO8601 timestamp
-    edited_timestamp: string | null; // ISO8601 timestamp
+    timestamp: string; // ISO8601形式のタイムスタンプ
+    edited_timestamp: string | null; // ISO8601形式のタイムスタンプ
     tts: boolean;
     mention_everyone: boolean;
     mentions: User[];
@@ -122,7 +122,7 @@ interface Embed {
     type?: string;
     description?: string;
     url?: string;
-    timestamp?: string; // ISO8601 timestamp
+    timestamp?: string; // ISO8601形式のタイムスタンプ
     color?: number;
     footer?: EmbedFooter;
     image?: EmbedImage;
@@ -225,16 +225,16 @@ interface Overwrite {
 interface ThreadMetadata {
     archived: boolean;
     auto_archive_duration: number;
-    archive_timestamp: string; // ISO8601 timestamp
+    archive_timestamp: string; // ISO8601形式のタイムスタンプ
     locaked: boolean;
     invitable?: boolean;
-    create_timestamp?: string | null; // ISO8601 timestamp
+    create_timestamp?: string | null; // ISO8601形式のタイムスタンプ
 }
 
 interface ThreadMember {
     id?: string;
     user_id?: string;
-    join_timestamp: string; // ISO8601 timestamp
+    join_timestamp: string; // ISO8601形式のタイムスタンプ
     flags: number;
     member?: GuildMember;
 }
@@ -276,7 +276,7 @@ interface RoleSubscriptionData {
     is_renewal: boolean;
 }
 
-/* Emoji Resource
+/* 絵文字リソース
 ====================================================*/
 interface Emoji {
     id: string | null;
@@ -289,7 +289,7 @@ interface Emoji {
     available?: boolean;
 }
 
-/* Guild Resource
+/* ギルドリソース
 ====================================================*/
 interface Guild {
     id: string;
@@ -301,7 +301,7 @@ interface Guild {
     owner?: boolean;
     owner_id: string;
     permissions?: string;
-    region?: string | null; // deprecated
+    region?: string | null; // 非推奨
     afk_channel_id: string | null;
     afk_timeout: number;
     widget_enabled?: boolean;
@@ -342,14 +342,14 @@ export interface GuildMember {
     nick?: string | null;
     avatar?: string | null;
     roles: string[];
-    joined_at: string; // ISO8601 timestamp
-    premium_since?: string | null; // ISO8601 timestamp
+    joined_at: string; // ISO8601形式のタイムスタンプ
+    premium_since?: string | null; // ISO8601形式のタイムスタンプ
     deaf: boolean;
     mute: boolean;
     flags: number;
     pending?: boolean;
     permissions?: string;
-    communication_disabled_until?: string | null; // ISO8601 timestamp
+    communication_disabled_until?: string | null; // ISO8601形式のタイムスタンプ
 }
 
 interface WelcomeScreen {
@@ -393,7 +393,7 @@ type GuildFeatures =
     | 'VIP_REGIONS'
     | 'WELCOME_SCREEN_ENABLED';
 
-/* Sticker Resource
+/* スタンプリソース
 ====================================================*/
 interface Sticker {
     id: string;
@@ -401,7 +401,7 @@ interface Sticker {
     name: string;
     description: string | null;
     tags: string;
-    asset?: string; // deprecated, now an empty string
+    asset?: string; // 非推奨 現在は空文字列
     type: number;
     format_type: number;
     available?: boolean;
@@ -416,7 +416,7 @@ interface StickerItem {
     format_type: number;
 }
 
-/* Users Resource
+/* ユーザーリソース
 ====================================================*/
 export interface User {
     id: string;
@@ -438,7 +438,7 @@ export interface User {
     avatar_decoration?: string | null;
 }
 
-/* Permissions
+/* パーミッション
 ====================================================*/
 interface Role {
     id: string;
@@ -464,7 +464,7 @@ interface RoleTags {
     guild_connections?: null;
 }
 
-/* Terms
+/* チーム
 ====================================================*/
 interface Team {
     icon: string | null;

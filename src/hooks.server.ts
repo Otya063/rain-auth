@@ -4,14 +4,15 @@ import { PUBLIC_AUTH_DOMAIN } from '$env/static/public';
 import type { Locales } from '$i18n/i18n-types';
 import { loadAllLocales } from '$i18n/i18n-util.sync';
 import { detectLocale, i18n, isLocale } from '$i18n/i18n-util';
-import { getToken } from '$lib/discord';
+import type { DatabaseConfig } from '$lib/types';
+import { getToken, initDb } from '$lib/utils/server';
 import { initAcceptLanguageHeaderDetector } from 'typesafe-i18n/detectors';
 
 loadAllLocales();
 const L = i18n();
 
 export const handle: Handle = async ({ event, resolve }) => {
-    // basic auth for accessing dev site
+    // Basic認証
     const auth = event.request.headers.get('Authorization');
     if (event.url.origin.includes('auth.dev')) {
         if (auth !== `Basic ${btoa(ADMIN_CREDENTIALS)}`) {
@@ -31,6 +32,13 @@ export const handle: Handle = async ({ event, resolve }) => {
         });
     }
 
+    const dbConfig = (await event.platform?.env.DB_CONFIG.get('db_config', 'json')) as DatabaseConfig | null;
+    if (!dbConfig) {
+        return new Response('DB_CONFIG_UNDEFINED', { status: 500 });
+    }
+
+    initDb(dbConfig); // 初回のみ接続を生成、以後はスキップ
+
     const [, lang] = event.url.pathname.split('/');
     const locale = isLocale(lang) ? (lang as Locales) : getPreferredLocale(event);
     const LL = L[locale];
@@ -48,9 +56,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     const pathname = event.url.pathname.replace(/\/ja\/|\/en\//, '');
     if (pathname === '/oauth/') {
-        let type: string | null;
-        let redirectUrl: string;
-        event.url.searchParams.get('reqType') === 'register' ? (type = 'register/done') : (type = event.url.searchParams.get('reqType'));
+        const type = event.url.searchParams.get('reqType');
         const code = event.url.searchParams.get('code');
 
         if (!code || !type) {
@@ -59,16 +65,17 @@ export const handle: Handle = async ({ event, resolve }) => {
             });
         }
 
-        redirectUrl = `${PUBLIC_AUTH_DOMAIN}/${event.locals.locale}/${type}/?code=${code}`;
+        const redirectUrl = `${PUBLIC_AUTH_DOMAIN}/${event.locals.locale}/${type}/?code=${code}`;
         return new Response(null, {
             status: 302,
             headers: { Location: redirectUrl },
         });
-    } else if (pathname === 'reset-password/' || pathname === 'link-discord/' || pathname === 'register/done/' || pathname === 'switch-character/') {
-        const code = event.url.searchParams.get('code')!;
-        let type: string;
-        pathname === 'register/done/' ? (type = 'register') : (type = pathname.replace('/', ''));
-        event.locals.tokenData = await getToken(code, type);
+    } else if (pathname === 'reset-password/' || pathname === 'link-discord/' || pathname === 'register/' || pathname === 'switch-character/') {
+        // register/はdiscord遷移前にもアクセスされるためcodeがある場合のみ交換
+        const code = event.url.searchParams.get('code');
+        if (code) {
+            event.locals.tokenData = await getToken(code, pathname.replace('/', ''));
+        }
     }
 
     return resolve(event, {

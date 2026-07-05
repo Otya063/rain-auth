@@ -23,6 +23,7 @@ body {
 }
 
 .wrapper_error {
+    width: 100%;
     display: grid;
     grid-template: 'header' auto 'contents' 1fr 'footer' auto;
     row-gap: 40px;

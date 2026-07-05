@@ -7,7 +7,7 @@ const en: BaseTranslation = {
     captchaText:
         'This site is protected by Cloudflare Turnstile and Cloudflare\'s <a target="_blank" rel="noopener noreferrer" href="https://www.cloudflare.com/privacypolicy/" style="text-decoration: underline; color: #32d9f3;">Privacy Policy</a> and <a target="_blank" rel="noopener noreferrer" href="https://www.cloudflare.com/website-terms/" style="text-decoration: underline; color: #32d9f3;">Terms of Service</a> apply.',
 
-    // Header Language Selection
+    // ヘッダー言語選択
     header: {
         currentLang: 'English',
         langSelectArea: {
@@ -22,7 +22,7 @@ const en: BaseTranslation = {
         },
     },
 
-    // Register Page
+    // 会員登録ページ
     register: {
         metaTitle: 'Register',
         metaDesc: 'This is the registration page for the Rain Server version of Monster Hunter Frontier Online.',
@@ -52,7 +52,7 @@ const en: BaseTranslation = {
         invConfPassword: 'Your password and confirmation password must match.',
     },
 
-    // Log In Page
+    // ログインページ
     login: {
         title: 'Log In',
         metaDesc: 'This is the login page for the Rain Server version of Monster Hunter Frontier Online.',
@@ -67,7 +67,7 @@ const en: BaseTranslation = {
         captchaInProg: 'Captcha validation in progress... Please wait a moment.',
     },
 
-    // Reset Password Page
+    // パスワード再設定ページ
     resetPassword: {
         metaTitle: 'Forgot Password',
         metaDesc: 'This is the password reset page for the Rain Server version of Monster Hunter Frontier Online. If you have lost your password, you can reset a new one from this page.',
@@ -79,11 +79,12 @@ const en: BaseTranslation = {
         stage3Btn: 'Reset',
         doneReset: 'Your password has been successfully reset.<br>You can now log in with your new password.',
         codeNotMatch: 'The code does not match.',
+        samePassword: 'The new password must be different from your current password.',
         verifCodeDesc:
             'Please enter the following verification code to complete this procedure.\nAccess to the "{site: string}" site is valid for {time: number} minutes immediately after this code is issued. Also, if you close the tab or refresh the site, you will not be able to access the site.',
     },
 
-    // Link Discord Page
+    // ディスコード連携ページ
     linkDiscord: {
         metaTitle: 'Discord Account Linkage',
         metaDesc: 'This is the account linkage page for the Rain Server version of Monster Hunter Frontier Online. You can link your discord account to your game account.',
@@ -101,7 +102,7 @@ const en: BaseTranslation = {
         userLinked: 'This user account is already linked to another discord account.',
     },
 
-    // Switch Character
+    // キャラクター切り替え
     switchCharacter: {
         metaTitle: 'Change Linked Character',
         metaDesc: 'This is the change of the linked character change page for the Rain Server version of Monster Hunter Frontier Online. You can change the linked character to another character.',
@@ -110,7 +111,7 @@ const en: BaseTranslation = {
         doneSwitchChar: 'The change of the linked character has been successfully performed.<br>Feel free to close this browser window.',
     },
 
-    // Maintenance Page
+    // メンテナンスページ
     maintenance: {
         title: 'Under Maintenance',
         message1: 'This site is currently under maintenance and cannot be accessed.',
@@ -118,7 +119,7 @@ const en: BaseTranslation = {
         message3: 'Please wait for a while until the end of maintenance is announced.',
     },
 
-    // Error Page
+    // エラーページ
     error: {
         unexpectedErr: 'Unexpected Error',
         otherMessage1: 'An error occurred in the page for the following reason:',
@@ -127,11 +128,12 @@ const en: BaseTranslation = {
         startOverMsg3: 'Please start the process over from the beginning.',
         unauthOps: 'Attempted to perform an unauthorized operation.',
         invalidCaptcha: 'Invalid capture. Please try again.',
-        failedApiMsg1: 'Failed to communicate with Rain API for the following reason:',
+        failedApiMsg1: 'Failed to process data for the following reason:',
         noPreRegData: 'No temporarily stored data exists.',
         sessionExpired: 'Your session may have expired.',
         paramsUndefined: 'Undefined parameters.',
         passedInvalidData: 'Invalid data was passed.',
+        linkDiscordFirst: 'Please complete the account linkage first from "Link Discord" on the login screen in the launcher.',
 
         400: {
             title: 'Bad Request',
@@ -178,7 +180,6 @@ const en: BaseTranslation = {
         register: {
             failedRegisterMsg1: 'Failed to register for the following reasons:',
             failedCreateUser: 'Failed to create user data for the following reasons:',
-            failedCreateCharacter: 'Failed to create character data for the following reasons:',
         },
 
         login: {
@@ -201,6 +202,10 @@ const en: BaseTranslation = {
             notJoinedDiscord: 'You have not joined the official Rain Server discord.',
             failedAddRole: 'Failed to add "Registered" role.',
             failedAddRoleMsg3: "For administrators: check that the bot's permissions are correct.",
+        },
+
+        switchCharacter: {
+            failedSwitchMsg1: 'Failed to switch the linked character for the following reason:',
         },
     },
 };

@@ -1,10 +1,5 @@
-main = "./.cloudflare/worker.js"
-site.bucket = "./.cloudflare/public"
-
-build.command = "npm run build"
-
 # Node.js compatibility: https://developers.cloudflare.com/workers/runtime-apis/nodejs/
-compatibility_date = "2024-09-23"
+compatibility_date = "2026-07-03"
 workers_dev = false
 compatibility_flags = [ "nodejs_compat" ]
 logpush = false
@@ -12,6 +7,27 @@ logpush = false
 [placement]
 mode = "smart"
 
-[vars]
+# vars / kv_namespaces are NOT inherited between environments,
+# so each [env.*] block below must fully redeclare its own bindings.
+
+[env.development]
+name = "auth_dev"
+
+[env.development.vars]
 MAINTENANCE_MODE = "false"
 MAINTENANCE_DATE = ""
+
+[[env.development.kv_namespaces]]
+binding = "DB_CONFIG"
+id = "045dffe2093148debaf5f2b09afb1f1f"
+
+[env.production]
+name = "auth"
+
+[env.production.vars]
+MAINTENANCE_MODE = "false"
+MAINTENANCE_DATE = ""
+
+[[env.production.kv_namespaces]]
+binding = "DB_CONFIG"
+id = "1b169176d42d40ae9df1ccc1006ff8dd"
