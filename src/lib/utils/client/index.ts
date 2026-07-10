@@ -1,12 +1,11 @@
 import type { Locales } from '$i18n/i18n-types';
-import type { WeaponType, ValidateToken, LinkedCharacterData, TokenValidateResponse } from '$lib/types';
+import type { LinkedCharacterData } from '$lib/types';
 import { writable, type Writable } from 'svelte/store';
 
-export * from './converter';
 export const showTip = writable(false);
 export const linkCharsData: Writable<LinkedCharacterData[]> = writable([]);
 
-/* Replaces the Locale Slug in a URL
+/* URL内のロケールスラッグを置換
 ====================================================*/
 export const replaceLocaleInUrl = (url: URL, locale: string, full = false): string => {
     const [, , ...rest] = url.pathname.split('/');
@@ -20,7 +19,7 @@ export const replaceLocaleInUrl = (url: URL, locale: string, full = false): stri
     return newUrl.toString();
 };
 
-/* Switching Buttons During Authentication
+/* 認証中のボタン切り替え
 ====================================================*/
 export const switchBtnInAuth = (enable: boolean, btnElm: HTMLElement | null, labelElm: HTMLCollectionOf<Element> | null = null, inputElm: NodeListOf<Element> | null = null): void => {
     if (enable) {
@@ -50,13 +49,13 @@ export const switchBtnInAuth = (enable: boolean, btnElm: HTMLElement | null, lab
     }
 };
 
-/* Load Article
+/* 記事の読み込み
 ====================================================*/
 export const loadArticle = (e: MouseEvent, url: URL, langCode: Locales, pathname?: string): void => {
     e.stopPropagation();
     let newURL: string;
 
-    // generate new URL
+    // 新しいURLを生成
     if (pathname) {
         newURL = `${url.origin}/${langCode}/${pathname}`;
     } else {
@@ -66,65 +65,19 @@ export const loadArticle = (e: MouseEvent, url: URL, langCode: Locales, pathname
     location.href = newURL;
 };
 
-/* Switch Display / Hide Password
+/* パスワードの表示・非表示切り替え
 ====================================================*/
 export const toggleHidePass = (e: MouseEvent): void => {
     const btnElm = e.target as HTMLButtonElement;
     const inputElm = btnElm.previousElementSibling as HTMLInputElement;
 
     if (inputElm.type === 'text') {
-        // hide password
+        // パスワードを隠す
         inputElm.type = 'password';
         btnElm.textContent = 'visibility_off';
     } else {
-        // show password
+        // パスワードを表示
         inputElm.type = 'text';
         btnElm.textContent = 'visibility';
     }
-};
-
-/* Disable Hide Password Button
-====================================================*/
-export const disableHidePass = (hidePass: HTMLCollectionOf<Element>): void => {
-    Array.from(hidePass).forEach((elm) => {
-        let element = elm as HTMLElement;
-        element.style.display = 'none';
-    });
-};
-
-/* Generate Random String for Token
-====================================================*/
-export const getRandomString = (length: number): string => {
-    const randomValues = crypto.getRandomValues(new Uint8Array(length));
-    const base64url = btoa(String.fromCharCode(...randomValues))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-
-    return base64url;
-};
-
-/* Validate Turnstile's Token
-====================================================*/
-export const validateToken = async (token: string, secret: string): Promise<ValidateToken> => {
-    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-            response: token,
-            secret: secret,
-        }),
-    });
-
-    const data: TokenValidateResponse = await res.json();
-
-    return {
-        // return the status
-        validateSuccess: data.success,
-
-        // return the first error if it exists
-        validateError: data['error-codes']?.length ? data['error-codes'][0] : null,
-    };
 };

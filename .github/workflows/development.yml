@@ -16,8 +16,6 @@ jobs:
     build-for-development:
         runs-on: ubuntu-latest
         env:
-            DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
-            DIRECT_URL: ${{ secrets.DEV_DIRECT_URL }}
             ADMIN_CREDENTIALS: ${{ secrets.ADMIN_CREDENTIALS }}
             COOKIES_DOMAIN: ${{ secrets.COOKIES_DOMAIN }}
             PUBLIC_MAIN_DOMAIN: ${{ secrets.DEV_MAIN_DOMAIN }}
@@ -36,20 +34,16 @@ jobs:
             - name: Install Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: 20
+                  node-version: 24
 
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               id: pnpm-install
               with:
-                  version: 8
                   run_install: false
 
             - name: Install dependencies
               run: pnpm i
-            
-            - name: Prisma generate
-              run: npx prisma generate --no-engine
 
             - name: Build
               run: pnpm build
@@ -60,4 +54,4 @@ jobs:
               with:
                   apiToken: ${{ secrets.CF_API_TOKEN }}
                   accountId: ${{ secrets.CF_ACCOUNT_ID }}
-                  command: deploy --name auth_dev
+                  command: deploy --env development

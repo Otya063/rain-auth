@@ -5,14 +5,15 @@
     import { DateTime } from 'luxon';
     import '$scss/style_error.scss';
 
-    export let data: PageData;
-    const { date, url } = data;
-    const arrStr: string[] = date.split(',');
-    const arrNum: number[] = arrStr.map((str) => parseInt(str, 10));
-    const origin = url.origin;
-    setLocale(data.locale);
+    let { data }: { data: PageData } = $props();
+    let arrNum = $derived(data.date.split(',').map((str) => parseInt(str, 10)));
+    let origin = $derived(data.url.origin);
 
-    // break out of the application-side layout
+    $effect(() => {
+        setLocale(data.locale);
+    });
+
+    // アプリ側レイアウトの外に出す
     onMount(() => {
         const wrapper = document.getElementById('wrapper');
         wrapper?.classList.add('disable_default_wrapper');
@@ -37,7 +38,7 @@
                 <!-- message2 -->
                 <li>
                     {$LL.maintenance['message2']()}
-                    {#if !date}
+                    {#if !data.date}
                         TBD
                     {:else}
                         <!-- UTC -->
@@ -78,8 +79,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <!-- font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="true" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
     {#if data.locale === 'ja'}
         <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;500;700&display=swap" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;500;700&display=swap" />

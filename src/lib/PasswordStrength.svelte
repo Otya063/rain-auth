@@ -1,14 +1,12 @@
 <script lang="ts">
     import LL from '$i18n/i18n-svelte';
-    import { showTip } from '$lib/utils';
+    import { showTip } from '$lib/utils/client';
     import checkPasswordStrength from 'check-password-strength';
     import type { Options } from 'check-password-strength';
-    import { createEventDispatcher } from 'svelte';
     import { get } from 'svelte/store';
     import { fade, slide } from 'svelte/transition';
 
-    export let password: string;
-    const dispatch = createEventDispatcher<{ strengthChange: string }>();
+    let { password, onstrengthChange }: { password: string; onstrengthChange?: (value: string) => void } = $props();
     const checkOptions: Options<string> = [
         {
             id: 0,
@@ -35,12 +33,14 @@
             minLength: 10,
         },
     ];
-    $: strength = checkPasswordStrength.passwordStrength(password, checkOptions);
-    $: {
-        dispatch('strengthChange', strength.value);
-    }
+    let strength = $derived(checkPasswordStrength.passwordStrength(password, checkOptions));
+
+    $effect(() => {
+        onstrengthChange?.(strength.value);
+    });
+
     const symbol: string = '!@#$%^&*()_+{}[]:;<>,.?~/-';
-    $: count = password !== undefined ? password.length : 0;
+    let count = $derived(password !== undefined ? password.length : 0);
 </script>
 
 <div class="color_indicators">

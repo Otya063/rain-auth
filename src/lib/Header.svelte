@@ -2,8 +2,8 @@
     import LangSelectArea from './LangSelectArea.svelte';
     import LL from '$i18n/i18n-svelte';
 
-    export let pathname: string;
-    let list = false;
+    let { pathname, hasAuthCode }: { pathname: string; hasAuthCode: boolean } = $props();
+    let list = $state(false);
 
     const onClickLangSel = () => {
         const btn = document.getElementById('sel_btn') as HTMLButtonElement;
@@ -27,14 +27,17 @@
 
 <header>
     <div class="header_inner">
-        <!-- svelte-ignore a11y-label-has-associated-control -->
-        <label class="header_platform" />
+        <!-- svelte-ignore a11y_label_has_associated_control -->
+        <label class="header_platform"></label>
 
         <button
             id="sel_btn"
-            on:click={() => onClickLangSel()}
+            onclick={() => onClickLangSel()}
             class="header_language_selector"
-            class:disabled_elm={pathname.includes('register/done/') || pathname.includes('reset-password/') || pathname.includes('link-discord/') || pathname.includes('switch-character/')}
+            class:disabled_elm={pathname.includes('reset-password/') ||
+                pathname.includes('link-discord/') ||
+                pathname.includes('switch-character/') ||
+                (pathname.includes('register/') && hasAuthCode)}
         >
             <span class="global_mark material-icons">public</span>
             <span class="current_language">

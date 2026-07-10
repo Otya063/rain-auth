@@ -1,19 +1,30 @@
 <script lang="ts">
     import type { ActionData, PageData } from './$types';
     import { applyAction, enhance } from '$app/forms';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import { PUBLIC_MAIN_DOMAIN, PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
     import LL, { locale } from '$i18n/i18n-svelte';
-    import { loadArticle, switchBtnInAuth } from '$lib/utils';
+    import { loadArticle, switchBtnInAuth } from '$lib/utils/client';
     import { fade, slide } from 'svelte/transition';
     import { Turnstile } from 'svelte-turnstile';
 
-    export let data: PageData;
-    export let form: ActionData;
-    let btnStage = 0;
-    let captchaNotPassed = true;
-    let captchaClientErr = false;
-    let captchaErrMsg = '';
+    let { data, form }: { data: PageData; form: ActionData } = $props();
+    let btnStage = $state(0);
+    let captchaNotPassed = $state(true);
+    let captchaClientErr = $state(false);
+    let captchaErrMsg = $state('');
+    let rememberMe = $state(false);
+
+    const enableSubmitButton = () => {
+        switchBtnInAuth(true, document.getElementById('btn'));
+        btnStage = 1;
+    };
+
+    const handleCaptchaError = (msg: string) => {
+        captchaClientErr = true;
+        captchaErrMsg = msg;
+        enableSubmitButton();
+    };
 </script>
 
 <main class="main_inner login">
@@ -40,6 +51,8 @@
                     {$LL.login['incPassword']()}
                 {:else if form?.errorCaptcha}
                     {form?.errorCaptchaMsg}
+                {:else if form?.errorServer}
+                    {form?.errorServerMsg}
                 {:else if captchaClientErr}
                     {@html captchaErrMsg}
                 {:else if captchaNotPassed}
@@ -55,7 +68,7 @@
         action="?/login"
         method="POST"
         use:enhance={() => {
-            // when clicking submit button
+            // 送信ボタンクリック時
             const nowBtnStage = btnStage;
             const btnElm = document.getElementById('btn');
             const labelElm = document.getElementsByClassName('part_label');
@@ -67,10 +80,10 @@
                 await applyAction(result);
 
                 if (form?.redirect) {
-                    // redirect
+                    // リダイレクト
                     window.location.assign(!data.redirectURL ? PUBLIC_MAIN_DOMAIN : data.redirectURL);
                 } else {
-                    // failure
+                    // 失敗
                     switchBtnInAuth(true, btnElm, labelElm, inputElm);
                     btnStage = nowBtnStage;
                 }
@@ -87,28 +100,18 @@
 
                 <div class="wrap_part_label">
                     <label for="remember_me">
-                        <span class="material-icons-outlined remember">radio_button_unchecked</span>
-                        <input
-                            class="part_input"
-                            style="display: none;"
-                            id="remember_me"
-                            name="remember_me"
-                            type="checkbox"
-                            on:change={() => {
-                                document.getElementsByClassName('remember')[0].textContent =
-                                    document.getElementsByClassName('remember')[0].textContent === 'radio_button_unchecked' ? 'radio_button_checked' : 'radio_button_unchecked';
-                            }}
-                        />
+                        <span class="material-icons-outlined remember">{rememberMe ? 'radio_button_checked' : 'radio_button_unchecked'}</span>
+                        <input class="part_input" style="display: none;" id="remember_me" name="remember_me" type="checkbox" bind:checked={rememberMe} />
                         {$LL.login['rememberMe']()}
                     </label>
 
-                    <button class="forgot_password" on:click={(e) => loadArticle(e, $page.url, $locale, 'login/?type=reset-password')} type="button">
+                    <button class="forgot_password" onclick={(e) => loadArticle(e, page.url, $locale, 'login/?type=reset-password')} type="button">
                         <span class="material-icons-outlined">chevron_right</span>
                         {$LL.login['forgotPassword']()}
                     </button>
                 </div>
 
-                <button class="form_area_msg_only" on:click={(e) => loadArticle(e, $page.url, $locale, 'register/')} type="button">
+                <button class="form_area_msg_only" onclick={(e) => loadArticle(e, page.url, $locale, 'register/')} type="button">
                     <span class="material-icons-outlined">chevron_right</span>
                     {$LL.login['notRegister']()}
                 </button>
@@ -120,35 +123,18 @@
             on:callback={(e) => {
                 if (e.detail.token) {
                     captchaNotPassed = false;
-                    switchBtnInAuth(true, document.getElementById('btn'));
-                    btnStage = 1;
+                    enableSubmitButton();
                 } else {
-                    captchaClientErr = true;
-                    captchaErrMsg = 'Failed to get token. Please try again.';
-                    switchBtnInAuth(true, document.getElementById('btn'));
-                    btnStage = 1;
+                    handleCaptchaError('Failed to get token. Please try again.');
                 }
             }}
             on:error={(e) => {
                 if (e.detail.code) {
-                    captchaClientErr = true;
-                    captchaErrMsg = `Captcha verification has failed. Please try again.<br />Code: ${e.detail.code}.`;
-                    switchBtnInAuth(true, document.getElementById('btn'));
-                    btnStage = 1;
+                    handleCaptchaError(`Captcha verification has failed. Please try again.<br />Code: ${e.detail.code}.`);
                 }
             }}
-            on:expired={() => {
-                captchaClientErr = true;
-                captchaErrMsg = 'Captcha verification expired. Please try again.';
-                switchBtnInAuth(true, document.getElementById('btn'));
-                btnStage = 1;
-            }}
-            on:timeout={() => {
-                captchaClientErr = true;
-                captchaErrMsg = 'Captcha verification timed out. Please try again.';
-                switchBtnInAuth(true, document.getElementById('btn'));
-                btnStage = 1;
-            }}
+            on:expired={() => handleCaptchaError('Captcha verification expired. Please try again.')}
+            on:timeout={() => handleCaptchaError('Captcha verification timed out. Please try again.')}
         />
 
         {#if !(captchaClientErr && captchaNotPassed)}

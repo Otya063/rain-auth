@@ -1,6 +1,6 @@
 import type { WeaponType } from '$lib/types';
 
-/* Convert FormData Into Object
+/* FormDataをオブジェクトに変換
 ====================================================*/
 export const convFormDataToObj = (data: FormData): Record<string, FormDataEntryValue> => {
     const obj = Object.fromEntries(data.entries());
@@ -8,7 +8,7 @@ export const convFormDataToObj = (data: FormData): Record<string, FormDataEntryV
     return obj;
 };
 
-/* Convert Hrp Into True HR
+/* HrpをHRに変換
 ====================================================*/
 export const convHrpToHr = (hrp: number | null): number => {
     switch (hrp) {
@@ -43,7 +43,7 @@ export const convHrpToHr = (hrp: number | null): number => {
     }
 };
 
-/* Get Weapon Type by Dec
+/* 数値から武器種を取得
 ====================================================*/
 export const getWpnTypeByDec = (dec: number | null, lang: string): WeaponType => {
     switch (lang) {

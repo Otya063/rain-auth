@@ -6,7 +6,7 @@ const ja: Translation = {
     captchaText:
         'このサイトはCloudflare Turnstileで保護されており、Cloudflare社の<a target="_blank" rel="noopener noreferrer" href="https://www.cloudflare.com/privacypolicy/" style="text-decoration: underline; color: #32d9f3;">プライバシーポリシー</a>と<a target="_blank" rel="noopener noreferrer" href="https://www.cloudflare.com/website-terms/" style="text-decoration: underline; color: #32d9f3;">利用規約</a>が適用されます。',
 
-    // Header Language Selection
+    // ヘッダー言語選択
     header: {
         currentLang: '日本語',
         langSelectArea: {
@@ -21,7 +21,7 @@ const ja: Translation = {
         },
     },
 
-    // Register Page
+    // 会員登録ページ
     register: {
         metaTitle: '無料会員登録',
         metaDesc: 'レインサーバー版「モンスターハンター フロンティア オンライン」の会員登録ページです。',
@@ -51,7 +51,7 @@ const ja: Translation = {
         invConfPassword: 'パスワードと確認用パスワードが一致しません。',
     },
 
-    // Log In Page
+    // ログインページ
     login: {
         title: 'ログイン',
         metaDesc: 'レインサーバー版「モンスターハンター フロンティア オンライン」のログインページです。',
@@ -66,7 +66,7 @@ const ja: Translation = {
         captchaInProg: 'キャプチャ認証中... しばらくお待ちください。',
     },
 
-    // Reset Password Page
+    // パスワード再設定ページ
     resetPassword: {
         metaTitle: 'パスワードを忘れたら',
         metaDesc: 'レインサーバー版「モンスターハンター フロンティア オンライン」のパスワード再設定ページです。パスワードを紛失された場合は、このページから新しいパスワードを再設定できます。',
@@ -78,11 +78,12 @@ const ja: Translation = {
         stage3Btn: '再設定',
         doneReset: 'パスワードの再設定が正常に完了しました。<br>新たなパスワードでログイン可能です。',
         codeNotMatch: 'コードが一致しません。',
+        samePassword: '新しいパスワードは現在のパスワードと異なるものにしてください。',
         verifCodeDesc:
             '以下の認証コードを入力して、手続きを完了してください。\n「{site}」サイトへのアクセスは、本コード発行直後から{time}分間有効です。また、タブを閉じるまたはページを更新した場合はアクセスできなくなります。',
     },
 
-    // Link Discord Page
+    // ディスコード連携ページ
     linkDiscord: {
         metaTitle: 'ディスコードアカウント連携',
         metaDesc: 'レインサーバー版「モンスターハンター フロンティア オンライン」のアカウント連携ページです。ご利用中のディスコードアカウントとゲームアカウントを連携することができます。',
@@ -100,7 +101,7 @@ const ja: Translation = {
         userLinked: 'このユーザーアカウントは、既に他のディスコードアカウントと連携されています。',
     },
 
-    // Switch Character
+    // キャラクター切り替え
     switchCharacter: {
         metaTitle: '連携済みキャラクター変更',
         metaDesc: 'レインサーバー版「モンスターハンター フロンティア オンライン」の連携キャラクター変更ページです。連携済みのキャラクターを別のキャラクターに変更することができます。',
@@ -109,7 +110,7 @@ const ja: Translation = {
         doneSwitchChar: '連携キャラクターの変更が正常に完了しました。<br>このページは閉じても構いません。',
     },
 
-    // Maintenance Page
+    // メンテナンスページ
     maintenance: {
         title: 'メンテナンス中',
         message1: '現在メンテナンス中のため、サイトへアクセスすることができません。',
@@ -117,7 +118,7 @@ const ja: Translation = {
         message3: 'メンテナンス終了までしばらくお待ちくださいますようお願いいたします。',
     },
 
-    // Error Page
+    // エラーページ
     error: {
         unexpectedErr: '予期せぬエラー',
         otherMessage1: '次のような理由により、ページ内でエラーが発生しました。',
@@ -126,11 +127,12 @@ const ja: Translation = {
         startOverMsg3: '最初からやり直してください。',
         unauthOps: '不正な操作を検知',
         invalidCaptcha: 'キャプチャが無効です。再度やり直してください。',
-        failedApiMsg1: '次のような理由により、レインAPIとの通信に失敗しました。',
+        failedApiMsg1: '次のような理由により、処理に失敗しました。',
         noPreRegData: '一時保存データが存在しない。',
         sessionExpired: 'セッションの有効期限が切れている。',
         paramsUndefined: 'パラメータが未定義。',
         passedInvalidData: '無効なデータが渡された。',
+        linkDiscordFirst: 'ランチャーにてログイン画面の「Link Discord」からまずは連携を完了させてください。',
 
         400: {
             title: '不正なリクエスト',
@@ -177,7 +179,6 @@ const ja: Translation = {
         register: {
             failedRegisterMsg1: '次のような理由により、会員登録に失敗しました。',
             failedCreateUser: '次のような理由により、ユーザーデータの作成に失敗しました。',
-            failedCreateCharacter: '次のような理由により、キャラクターデータの作成に失敗しました。',
         },
 
         login: {
@@ -200,6 +201,10 @@ const ja: Translation = {
             notJoinedDiscord: 'レインサーバー公式ディスコードに参加していない。',
             failedAddRole: '「Registered」ロールの追加に失敗。',
             failedAddRoleMsg3: '管理者向け：ボットの権限が正しいか確認してください。',
+        },
+
+        switchCharacter: {
+            failedSwitchMsg1: '次のような理由により、連携キャラクターの切り替えに失敗しました。',
         },
     },
 };

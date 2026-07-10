@@ -11,16 +11,17 @@
     const { url } = data;
     const origin = url.origin;
     const pathname = url.pathname;
+    const hasAuthCode = url.searchParams.has('code');
 
-    // at the top, set the locale before the store is accessed and before the actual rendering takes place
+    // storeへのアクセスや実際のレンダリングより前にロケールを設定
     setLocale(data.locale);
 </script>
 
 <Analytics />
 
-<Header {pathname} />
+<Header {pathname} {hasAuthCode} />
 
-<div class="background_img" />
+<div class="background_img"></div>
 
 <slot />
 
@@ -47,8 +48,8 @@
     <Alternate />
     <link rel="canonical" href={String(url)} />
     <!-- font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="true" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
     {#if data.locale === 'ja'}
         <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;500;700&display=swap" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;500;700&display=swap" />
