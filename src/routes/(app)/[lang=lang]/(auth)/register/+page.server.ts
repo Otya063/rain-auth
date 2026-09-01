@@ -1,18 +1,15 @@
 import type { Action, Actions, PageServerLoad } from './$types';
 import { error, fail } from '@sveltejs/kit';
-import { COOKIES_DOMAIN, TURNSTILE_SECRET_KEY } from '$env/static/private';
-import { PostgresManager, getGuildMember, getUserData, addRoleToUser, sendDirectMessages, convFormDataToObj, validateToken } from '$lib/utils/server';
+import { TURNSTILE_SECRET_KEY } from '$env/static/private';
+import { PostgresManager, getUserData, grantRegisteredRole, sendDirectMessages, convFormDataToObj, validateToken, setSession, getSession, clearSession } from '$lib/utils/server';
 import type { PreRegisterData } from '$lib/types';
 import bcrypt from 'bcryptjs';
-import { DateTime } from 'luxon';
 
 const usernameRegex = /^[a-zA-Z0-9]{6,20}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])(?=.*\d).{10,32}$/;
-const PRE_REGISTER_TTL_SECONDS = 60 * 5;
-
-let preRegisterData: PreRegisterData | undefined;
-let preRegisterStartTime: DateTime | undefined;
-let hashedVerificationCode: string | undefined;
+const SESSION_NAME = 'preRegister';
+const OAUTH_TTL_SECONDS = 60 * 10; // discord認証の往復用
+const PRE_REGISTER_TTL_SECONDS = 60 * 5; // DM認証コードの有効期限
 
 export const load: PageServerLoad = async ({ url, cookies, locals: { LL, tokenData } }) => {
     const code = url.searchParams.get('code');
@@ -21,14 +18,10 @@ export const load: PageServerLoad = async ({ url, cookies, locals: { LL, tokenDa
         return;
     }
 
-    const username = cookies.get('username');
-    const hashedPassword = cookies.get('hashedPassword');
-    if (!username || !hashedPassword) {
+    const session = await getSession<PreRegisterData>(cookies, SESSION_NAME);
+    if (!session) {
         throw error(401, { message: '', message1: LL.error['oauth'].message1(), message2: [LL.error['oauth'].noDataForAuth()], message3: LL.error['oauth'].noDataForAuthMsg3() });
     }
-
-    cookies.delete('username', { domain: COOKIES_DOMAIN, path: '/', secure: true, httpOnly: true });
-    cookies.delete('hashedPassword', { domain: COOKIES_DOMAIN, path: '/', secure: true, httpOnly: true });
 
     if (!tokenData) {
         throw error(401, { message: '', message1: LL.error['oauth'].message1(), message2: [LL.error['oauth'].failedGetToken()], message3: LL.error['startOverMsg3']() });
@@ -39,7 +32,6 @@ export const load: PageServerLoad = async ({ url, cookies, locals: { LL, tokenDa
         throw error(400, { message: '', message1: LL.error['oauth'].message1(), message2: [LL.error['oauth'].failedGetUser()], message3: LL.error['startOverMsg3']() });
     }
 
-    const discordAccessToken = tokenData.access_token;
     const discordId = userData.id;
     const { charId: linkedCharId, userId: linkedUserId } = await new PostgresManager('get', 'discordData', { discordId }).execute();
     if (linkedCharId || linkedUserId) {
@@ -48,13 +40,10 @@ export const load: PageServerLoad = async ({ url, cookies, locals: { LL, tokenDa
 
     tokenData = null;
 
-    preRegisterData = { discordAccessToken, discordId, username, hashedPassword };
-    preRegisterStartTime = DateTime.local();
-
     const salt = await bcrypt.genSalt(12);
     const plainVerificationCode = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).substring(0, 16);
-    hashedVerificationCode = await bcrypt.hash(plainVerificationCode, salt);
-    const createdDM = await sendDirectMessages(userData.id, plainVerificationCode, 5, 'register', LL);
+    const hashedVerificationCode = await bcrypt.hash(plainVerificationCode, salt);
+    const createdDM = await sendDirectMessages(discordId, plainVerificationCode, 5, 'register', LL);
     if (!createdDM) {
         throw error(400, {
             message: '',
@@ -63,6 +52,8 @@ export const load: PageServerLoad = async ({ url, cookies, locals: { LL, tokenDa
             message3: LL.error['resetPassword'].failedSendDMMsg3(),
         });
     }
+
+    await setSession(cookies, SESSION_NAME, { ...session, discordId, hashedVerificationCode }, PRE_REGISTER_TTL_SECONDS);
 };
 
 const register: Action = async ({ request, cookies, locals: { LL } }) => {
@@ -107,8 +98,7 @@ const register: Action = async ({ request, cookies, locals: { LL } }) => {
             const salt = await bcrypt.genSalt(12);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            cookies.set('username', username, { domain: COOKIES_DOMAIN, path: '/', secure: true, httpOnly: true });
-            cookies.set('hashedPassword', hashedPassword, { domain: COOKIES_DOMAIN, path: '/', secure: true, httpOnly: true });
+            await setSession(cookies, SESSION_NAME, { username, hashedPassword }, OAUTH_TTL_SECONDS);
 
             return { currentStage: 1, nextStage: 2 };
         }
@@ -124,12 +114,14 @@ const register: Action = async ({ request, cookies, locals: { LL } }) => {
         }
 
         case 4: {
-            if (!preRegisterData || !preRegisterStartTime || !hashedVerificationCode) {
-                return fail(400, { error: true, unauthOps: true });
+            // セッションの検証（未開始・改竄・期限切れをまとめて弾く）
+            const session = await getSession<PreRegisterData>(cookies, SESSION_NAME);
+            if (!session?.discordId || !session.hashedVerificationCode) {
+                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [LL.error['noPreRegData'](), LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
             }
 
             const { verification_code } = convFormDataToObj(data);
-            const correctCode = await bcrypt.compare(String(verification_code), hashedVerificationCode);
+            const correctCode = await bcrypt.compare(String(verification_code), session.hashedVerificationCode);
 
             // コードの検証
             if (!correctCode) {
@@ -143,29 +135,20 @@ const register: Action = async ({ request, cookies, locals: { LL } }) => {
                 return fail(400, { error: true, errorCaptcha: true, errorCaptchaMsg: `${validateError}. Please try again.` || LL.error['invalidCaptcha']() });
             }
 
-            // セッションの検証（旧KVエントリのexpirationTtlに相当）
-            const elapsedSeconds = DateTime.local().diff(preRegisterStartTime, 'seconds').seconds;
-            if (elapsedSeconds > PRE_REGISTER_TTL_SECONDS) {
-                throw error(400, { message: '', message1: LL.error['failedApiMsg1'](), message2: [LL.error['noPreRegData'](), LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
-            }
+            const { discordId, username, hashedPassword } = session;
 
-            const { discordAccessToken, discordId, username, hashedPassword } = preRegisterData;
-
-            const guildMemberData = await getGuildMember(discordAccessToken);
-            if (!guildMemberData) {
+            // ロール付与はDB書き込みより前 ここで失敗しても何も作られないためやり直しが効く
+            const roleResult = await grantRegisteredRole(discordId);
+            if (roleResult === 'notJoined') {
                 throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [LL.error['linkDiscord'].notJoinedDiscord()], message3: LL.error['startOverMsg3']() });
             }
-
-            if (!guildMemberData.roles.includes('1017643913667936318')) {
-                const registeredRoleStatus = await addRoleToUser(discordId, '1017643913667936318');
-                if (registeredRoleStatus !== 204) {
-                    throw error(400, {
-                        message: '',
-                        message1: LL.error['linkDiscord'].failedLinkMsg1(),
-                        message2: [LL.error['linkDiscord'].failedAddRole()],
-                        message3: LL.error['linkDiscord'].failedAddRoleMsg3(),
-                    });
-                }
+            if (roleResult === 'failed') {
+                throw error(400, {
+                    message: '',
+                    message1: LL.error['linkDiscord'].failedLinkMsg1(),
+                    message2: [LL.error['linkDiscord'].failedAddRole()],
+                    message3: LL.error['linkDiscord'].failedAddRoleMsg3(),
+                });
             }
 
             // ユーザーアカウントと最初のキャラクターをまとめて作成
@@ -180,9 +163,7 @@ const register: Action = async ({ request, cookies, locals: { LL } }) => {
                 throw error(400, { message: '', message1: LL.error['register'].failedRegisterMsg1(), message2: [discordLinkMsg], message3: LL.error['startOverMsg3']() });
             }
 
-            preRegisterData = undefined;
-            preRegisterStartTime = undefined;
-            hashedVerificationCode = undefined;
+            clearSession(cookies, SESSION_NAME);
 
             return { currentStage: 4, nextStage: 5 };
         }
