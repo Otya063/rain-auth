@@ -1,18 +1,14 @@
 import type { PageServerLoad } from './$types';
 import { error, type Action, type Actions, fail } from '@sveltejs/kit';
 import { TURNSTILE_SECRET_KEY } from '$env/static/private';
-import { PostgresManager, getGuildMember, getUserData, addRoleToUser, sendDirectMessages, convFormDataToObj, convHrpToHr, getWpnTypeByDec, validateToken } from '$lib/utils/server';
+import { PostgresManager, getUserData, grantRegisteredRole, sendDirectMessages, convFormDataToObj, convHrpToHr, getWpnTypeByDec, validateToken, setSession, getSession, clearSession } from '$lib/utils/server';
 import type { LinkDiscordData } from '$lib/types';
 import bcrypt from 'bcryptjs';
-import { DateTime } from 'luxon';
 
+const SESSION_NAME = 'linkDiscord';
 const LINK_DISCORD_TTL_SECONDS = 60 * 10;
 
-let linkDiscordData: LinkDiscordData | undefined;
-let linkDiscordStartTime: DateTime | undefined;
-let hashedVerificationCode: string | undefined;
-
-export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) => {
+export const load: PageServerLoad = async ({ url, cookies, locals: { LL, tokenData } }) => {
     const code = url.searchParams.get('code');
     if (!code) {
         throw error(401, { message: '', message1: LL.error['oauth'].message1(), message2: [LL.error['oauth'].noDataForAuth()], message3: LL.error['oauth'].noDataForAuthMsg3() });
@@ -27,7 +23,6 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
         throw error(400, { message: '', message1: LL.error['oauth'].message1(), message2: [LL.error['oauth'].failedGetUser()], message3: LL.error['startOverMsg3']() });
     }
 
-    const discordAccessToken = tokenData.access_token;
     const discordId = userData.id;
     const discordUsername = userData.username;
     const discordAvatar = userData.avatar;
@@ -38,13 +33,10 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
 
     tokenData = null;
 
-    linkDiscordData = { discordAccessToken, discordId, discordUsername, discordAvatar };
-    linkDiscordStartTime = DateTime.local();
-
     const salt = await bcrypt.genSalt(12);
     const plainVerificationCode = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).substring(0, 16);
-    hashedVerificationCode = await bcrypt.hash(plainVerificationCode, salt);
-    const createdDM = await sendDirectMessages(userData.id, plainVerificationCode, 10, 'link-discord', LL);
+    const hashedVerificationCode = await bcrypt.hash(plainVerificationCode, salt);
+    const createdDM = await sendDirectMessages(discordId, plainVerificationCode, 10, 'link-discord', LL);
     if (!createdDM) {
         throw error(400, {
             message: '',
@@ -54,12 +46,20 @@ export const load: PageServerLoad = async ({ url, locals: { LL, tokenData } }) =
         });
     }
 
+    await setSession(cookies, SESSION_NAME, { discordId, discordUsername, discordAvatar, hashedVerificationCode }, LINK_DISCORD_TTL_SECONDS);
+
     return { discordId, discordUsername };
 };
 
-const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
+const linkDiscord: Action = async ({ locals: { LL, locale }, request, cookies }) => {
     const data = await request.formData();
     const { stage } = convFormDataToObj(data);
+
+    // セッションの検証（未開始・改竄・期限切れをまとめて弾く）
+    const session = await getSession<LinkDiscordData>(cookies, SESSION_NAME);
+    if (Number(stage) > 1 && !session) {
+        throw error(401, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
+    }
 
     switch (Number(stage)) {
         case 1: {
@@ -67,12 +67,8 @@ const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
         }
 
         case 2: {
-            if (!hashedVerificationCode) {
-                return fail(400, { error: true, unauthOps: true });
-            }
-
             const { verification_code } = convFormDataToObj(data);
-            const correctCode = await bcrypt.compare(String(verification_code), hashedVerificationCode);
+            const correctCode = await bcrypt.compare(String(verification_code), session!.hashedVerificationCode);
 
             // コードの検証
             if (!correctCode) {
@@ -90,10 +86,6 @@ const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
         }
 
         case 3: {
-            if (!linkDiscordData || !linkDiscordStartTime) {
-                return fail(400, { error: true, unauthOps: true });
-            }
-
             const { username, password } = convFormDataToObj(data);
 
             // ユーザー名のバリデーション
@@ -122,13 +114,7 @@ const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
                 return fail(400, { error: true, userLinked: true, errorUsername: true, errorPassword: true });
             }
 
-            // セッションの検証
-            const elapsedSeconds = DateTime.local().diff(linkDiscordStartTime, 'seconds').seconds;
-            if (elapsedSeconds > LINK_DISCORD_TTL_SECONDS) {
-                throw error(401, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
-            }
-
-            linkDiscordData.userId = user.id;
+            await setSession(cookies, SESSION_NAME, { ...session, userId: user.id }, LINK_DISCORD_TTL_SECONDS);
 
             const charData = await new PostgresManager('get', 'charactersByUserId', { userId: user.id }).execute();
             const characterData = charData.map((character) => ({
@@ -143,11 +129,10 @@ const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
         }
 
         case 4: {
-            if (!linkDiscordData?.userId) {
+            const { discordId, discordUsername, discordAvatar, userId } = session!;
+            if (!userId) {
                 return fail(400, { error: true, unauthOps: true });
             }
-
-            const { discordAccessToken, discordId, discordUsername, discordAvatar, userId } = linkDiscordData;
 
             const { character_data } = convFormDataToObj(data);
             const charData: string[] = String(character_data).split('-');
@@ -155,21 +140,17 @@ const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
             const charName = charData[1];
             const charInfo = charData[2];
 
-            const guildMemberData = await getGuildMember(discordAccessToken);
-            if (!guildMemberData) {
+            const roleResult = await grantRegisteredRole(discordId);
+            if (roleResult === 'notJoined') {
                 throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [LL.error['linkDiscord'].notJoinedDiscord()], message3: LL.error['startOverMsg3']() });
             }
-
-            if (!guildMemberData.roles.includes('1017643913667936318')) {
-                const registeredRoleStatus = await addRoleToUser(discordId, '1017643913667936318');
-                if (registeredRoleStatus !== 204) {
-                    throw error(400, {
-                        message: '',
-                        message1: LL.error['linkDiscord'].failedLinkMsg1(),
-                        message2: [LL.error['linkDiscord'].failedAddRole()],
-                        message3: LL.error['linkDiscord'].failedAddRoleMsg3(),
-                    });
-                }
+            if (roleResult === 'failed') {
+                throw error(400, {
+                    message: '',
+                    message1: LL.error['linkDiscord'].failedLinkMsg1(),
+                    message2: [LL.error['linkDiscord'].failedAddRole()],
+                    message3: LL.error['linkDiscord'].failedAddRoleMsg3(),
+                });
             }
 
             const character = await new PostgresManager('get', 'charactersByUserId', { userId }).execute();
@@ -188,9 +169,7 @@ const linkDiscord: Action = async ({ locals: { LL, locale }, request }) => {
                 throw error(400, { message: '', message1: LL.error['linkDiscord'].failedLinkMsg1(), message2: [discordLinkMsg], message3: LL.error['startOverMsg3']() });
             }
 
-            linkDiscordData = undefined;
-            linkDiscordStartTime = undefined;
-            hashedVerificationCode = undefined;
+            clearSession(cookies, SESSION_NAME);
 
             return { currentStage: 4, nextStage: 5, discordUsername, discordAvatar, selectedCharName: charName, selectedCharInfo: charInfo };
         }

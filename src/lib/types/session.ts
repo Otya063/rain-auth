@@ -1,36 +1,35 @@
-/* 会員登録フローの一時セッションデータ
+/* 会員登録フローの一時セッションデータ（discord認証前はusername/hashedPasswordのみ）
 ====================================================*/
 export interface PreRegisterData {
-    discordAccessToken: string;
-    discordId: string;
     username: string;
     hashedPassword: string;
+    discordId?: string;
+    hashedVerificationCode?: string;
 }
 
 /* ディスコード連携フローの一時セッションデータ
 ====================================================*/
 export interface LinkDiscordData {
-    discordAccessToken: string;
     discordId: string;
     discordUsername: string;
     discordAvatar: string | null;
+    hashedVerificationCode: string;
     userId?: number;
 }
 
 /* パスワード再設定フローの一時セッションデータ
 ====================================================*/
 export interface ResetPasswordData {
-    discordAccessToken: string;
-    discordId: string;
     userId: number;
     username: string;
+    hashedVerificationCode: string;
 }
 
 /* キャラクター切り替えフローの一時セッションデータ
 ====================================================*/
 export interface SwitchCharacterData {
     discordId: string;
-    discordUsername: string;
     userId: number;
     currentCharId: number;
+    hashedVerificationCode: string;
 }

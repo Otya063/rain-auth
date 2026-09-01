@@ -1,19 +1,14 @@
 import type { Action, Actions, PageServerLoad } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { TURNSTILE_SECRET_KEY } from '$env/static/private';
-import { PostgresManager, getUserData, sendDirectMessages, convFormDataToObj, convHrpToHr, getWpnTypeByDec, validateToken } from '$lib/utils/server';
-import type { SwitchCharacterData, LinkedCharacterData, CharacterRow } from '$lib/types';
+import { PostgresManager, getUserData, sendDirectMessages, convFormDataToObj, convHrpToHr, getWpnTypeByDec, validateToken, setSession, getSession, clearSession } from '$lib/utils/server';
+import type { SwitchCharacterData, LinkedCharacterData } from '$lib/types';
 import bcrypt from 'bcryptjs';
-import { DateTime } from 'luxon';
 
+const SESSION_NAME = 'switchCharacter';
 const SWITCH_CHARACTER_TTL_SECONDS = 60 * 10;
 
-let switchCharacterData: SwitchCharacterData | undefined;
-let switchCharacterStartTime: DateTime | undefined;
-let hashedVerificationCode: string | undefined;
-let availableCharacters: CharacterRow[] | undefined;
-
-export const load: PageServerLoad = async ({ url, locals: { LL, locale, tokenData } }) => {
+export const load: PageServerLoad = async ({ url, cookies, locals: { LL, locale, tokenData } }) => {
     const code = url.searchParams.get('code');
     if (!code) {
         throw error(401, { message: '', message1: LL.error['oauth'].message1(), message2: [LL.error['oauth'].noDataForAuth()], message3: LL.error['oauth'].noDataForAuthMsg3() });
@@ -50,13 +45,10 @@ export const load: PageServerLoad = async ({ url, locals: { LL, locale, tokenDat
 
     tokenData = null;
 
-    switchCharacterData = { discordId, discordUsername, userId: linkedUserId, currentCharId: linkedCharId };
-    switchCharacterStartTime = DateTime.local();
-
     const salt = await bcrypt.genSalt(12);
     const plainVerificationCode = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16)))).substring(0, 16);
-    hashedVerificationCode = await bcrypt.hash(plainVerificationCode, salt);
-    const createdDM = await sendDirectMessages(userData.id, plainVerificationCode, 10, 'switch-character', LL);
+    const hashedVerificationCode = await bcrypt.hash(plainVerificationCode, salt);
+    const createdDM = await sendDirectMessages(discordId, plainVerificationCode, 10, 'switch-character', LL);
     if (!createdDM) {
         throw error(400, {
             message: '',
@@ -66,12 +58,20 @@ export const load: PageServerLoad = async ({ url, locals: { LL, locale, tokenDat
         });
     }
 
+    await setSession(cookies, SESSION_NAME, { discordId, userId: linkedUserId, currentCharId: linkedCharId, hashedVerificationCode }, SWITCH_CHARACTER_TTL_SECONDS);
+
     return { discordId, discordUsername, currentLinkedCharacterData };
 };
 
-const switchCharacter: Action = async ({ locals: { LL, locale }, request }) => {
+const switchCharacter: Action = async ({ locals: { LL, locale }, request, cookies }) => {
     const data = await request.formData();
     const { stage } = convFormDataToObj(data);
+
+    // セッションの検証（未開始・改竄・期限切れをまとめて弾く）
+    const session = await getSession<SwitchCharacterData>(cookies, SESSION_NAME);
+    if (Number(stage) > 1 && !session) {
+        throw error(401, { message: '', message1: LL.error['switchCharacter'].failedSwitchMsg1(), message2: [LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
+    }
 
     switch (Number(stage)) {
         case 1: {
@@ -79,12 +79,8 @@ const switchCharacter: Action = async ({ locals: { LL, locale }, request }) => {
         }
 
         case 2: {
-            if (!switchCharacterData || !switchCharacterStartTime || !hashedVerificationCode) {
-                return fail(400, { error: true, unauthOps: true });
-            }
-
             const { verification_code } = convFormDataToObj(data);
-            const correctCode = await bcrypt.compare(String(verification_code), hashedVerificationCode);
+            const correctCode = await bcrypt.compare(String(verification_code), session!.hashedVerificationCode);
 
             // コードの検証
             if (!correctCode) {
@@ -98,31 +94,25 @@ const switchCharacter: Action = async ({ locals: { LL, locale }, request }) => {
                 return fail(400, { error: true, errorCaptcha: true, errorCaptchaMsg: `${validateError}. Please try again.` || LL.error['invalidCaptcha']() });
             }
 
-            // セッションの検証
-            const elapsedSeconds = DateTime.local().diff(switchCharacterStartTime, 'seconds').seconds;
-            if (elapsedSeconds > SWITCH_CHARACTER_TTL_SECONDS) {
-                throw error(401, { message: '', message1: LL.error['switchCharacter'].failedSwitchMsg1(), message2: [LL.error['sessionExpired']()], message3: LL.error['startOverMsg3']() });
-            }
-
-            availableCharacters = await new PostgresManager('get', 'charactersByUserId', { userId: switchCharacterData.userId }).execute();
-            const characterData = availableCharacters
-                .filter((c) => c.id !== switchCharacterData!.currentCharId)
+            const characters = await new PostgresManager('get', 'charactersByUserId', { userId: session!.userId }).execute();
+            const characterData = characters
+                .filter((c) => c.id !== session!.currentCharId)
                 .map((c) => ({ id: c.id, name: c.name, hr: convHrpToHr(c.hrp), gr: c.gr, weapon: getWpnTypeByDec(c.weapon_type, locale) }));
 
             return { currentStage: 2, nextStage: 3, characterData };
         }
 
         case 3: {
-            if (!switchCharacterData || !availableCharacters) {
-                return fail(400, { error: true, unauthOps: true });
-            }
+            const { discordId, userId } = session!;
 
             const { character_data } = convFormDataToObj(data);
             const charData = String(character_data).split('-');
             const charId = Number(charData[0]);
             const charName = charData[1];
 
-            const filteredChar = availableCharacters.find((c) => c.id === charId);
+            // 所有キャラクターかどうかはDBで引き直して確認する（stage2の結果を持ち回らない）
+            const characters = await new PostgresManager('get', 'charactersByUserId', { userId }).execute();
+            const filteredChar = characters.find((c) => c.id === charId);
             if (!filteredChar) {
                 throw error(400, {
                     message: '',
@@ -132,18 +122,12 @@ const switchCharacter: Action = async ({ locals: { LL, locale }, request }) => {
                 });
             }
 
-            const { success: charIdUpdated, message: updateMsg } = await new PostgresManager('update', 'discordCharId', {
-                discordId: switchCharacterData.discordId,
-                charId,
-            }).execute();
+            const { success: charIdUpdated, message: updateMsg } = await new PostgresManager('update', 'discordCharId', { discordId, charId }).execute();
             if (!charIdUpdated) {
                 throw error(400, { message: '', message1: LL.error['switchCharacter'].failedSwitchMsg1(), message2: [updateMsg || LL.error['noUserData']()], message3: LL.error['startOverMsg3']() });
             }
 
-            switchCharacterData = undefined;
-            switchCharacterStartTime = undefined;
-            hashedVerificationCode = undefined;
-            availableCharacters = undefined;
+            clearSession(cookies, SESSION_NAME);
 
             return { currentStage: 3, nextStage: 4 };
         }

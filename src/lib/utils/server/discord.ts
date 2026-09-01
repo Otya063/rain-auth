@@ -2,6 +2,9 @@ import type { Token, User, Channel, Message, GuildMember } from '$lib/types';
 import type { TranslationFunctions } from '$i18n/i18n-types';
 import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_CALLBACK_URI, DISCORD_BOT_TOKEN } from '$env/static/private';
 
+const GUILD_ID = '937230168223789066';
+const REGISTERED_ROLE_ID = '1017643913667936318';
+
 /* 認証用トークンデータの取得
 ====================================================*/
 export const getToken = async (code: string, type: string): Promise<Token | null> => {
@@ -94,24 +97,38 @@ export const sendDirectMessages = async (userId: string, verificationCode: strin
     return res1.ok ? await res1.json() : null;
 };
 
-export const getGuildMember = async (accessToken: string): Promise<GuildMember | null> => {
-    const res = await fetch(`https://discordapp.com/api/users/@me/guilds/937230168223789066/member`, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${accessToken}` },
+/* 「Registered」ロールの付与
+   メンバー情報はBot権限で参照する（Bearer+/users/@me/guilds/{id}/memberはguilds.members.readスコープが必要なため）
+====================================================*/
+export const grantRegisteredRole = async (discordId: string): Promise<'ok' | 'notJoined' | 'failed'> => {
+    const res = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/members/${discordId}`, {
+        headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN}` },
     });
 
-    return res.ok ? await res.json() : null;
-};
+    if (res.status === 404) {
+        return 'notJoined';
+    }
+    if (!res.ok) {
+        console.error(`getGuildMember failed: status=${res.status} body=${await res.text()}`);
 
-export const addRoleToUser = async (userId: string, roleId: string): Promise<number> => {
-    const res = await fetch(`https://discordapp.com/api/guilds/937230168223789066/members/${userId}/roles/${roleId}`, {
+        return 'failed';
+    }
+
+    const member: GuildMember = await res.json();
+    if (member.roles.includes(REGISTERED_ROLE_ID)) {
+        return 'ok';
+    }
+
+    const addRes = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/members/${discordId}/roles/${REGISTERED_ROLE_ID}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bot ${DISCORD_BOT_TOKEN}` },
     });
 
-    if (!res.ok) {
-        console.error(`addRoleToUser failed: status=${res.status} body=${await res.text()}`);
+    if (!addRes.ok) {
+        console.error(`addRoleToUser failed: status=${addRes.status} body=${await addRes.text()}`);
+
+        return 'failed';
     }
 
-    return res.status;
+    return 'ok';
 };

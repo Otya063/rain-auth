@@ -3,6 +3,7 @@
     "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte", ".svelte-kit/ambient.d.ts"],
     "compilerOptions": {
         "allowJs": true,
+        "allowImportingTsExtensions": true,
         "checkJs": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
