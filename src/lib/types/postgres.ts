@@ -1,15 +1,4 @@
 /**
- * データベース認証情報
- */
-export interface DatabaseConfig {
-    host: string;
-    port: number;
-    database: string;
-    username: string;
-    password: string;
-}
-
-/**
  * usersテーブルの行データ
  */
 export type UserRow = {
