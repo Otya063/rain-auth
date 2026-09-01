@@ -13,7 +13,7 @@ directory = ".svelte-kit/cloudflare"
 [placement]
 mode = "smart"
 
-# vars / kv_namespaces are NOT inherited between environments,
+# vars / bindings are NOT inherited between environments,
 # so each [env.*] block below must fully redeclare its own bindings.
 
 [env.development]
@@ -23,9 +23,9 @@ name = "auth_dev"
 MAINTENANCE_MODE = "false"
 MAINTENANCE_DATE = ""
 
-[[env.development.kv_namespaces]]
-binding = "DB_CONFIG"
-id = "045dffe2093148debaf5f2b09afb1f1f"
+[[env.development.hyperdrive]]
+binding = "HYPERDRIVE"
+id = "8da8e9b522234f9caaec0aa25e0827aa"
 
 [env.production]
 name = "auth"
@@ -34,6 +34,6 @@ name = "auth"
 MAINTENANCE_MODE = "false"
 MAINTENANCE_DATE = ""
 
-[[env.production.kv_namespaces]]
-binding = "DB_CONFIG"
-id = "1b169176d42d40ae9df1ccc1006ff8dd"
+[[env.production.hyperdrive]]
+binding = "HYPERDRIVE"
+id = "688c3b61066846a1ae4a977b1c05d5b9"
